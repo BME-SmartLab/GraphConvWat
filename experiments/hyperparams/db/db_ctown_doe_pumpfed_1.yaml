@@ -1,0 +1,25 @@
+wds : ctown
+nScenes : 10000
+genAlgo : doe
+
+chunks:
+    height  : 10000
+    width   : null
+
+demand:
+    nodalLo : .7
+    nodalHi : 1.0
+    totalLo : .3
+    totalHi : 1.0
+
+pumpSpeed:
+    limitLo : .8
+    limitHi : 1.2
+
+feed:
+    gravityFedProba : 0
+    pumpOffProba    : 0
+
+data:
+    vldSplit    : 0.2
+    tstSplit    : 0.2

@@ -1,0 +1,18 @@
+# Ignore
+data/*
+experiments/logs/*
+experiments/models/*
+*events*
+*.db
+*.h5
+*.pkl
+*.swp
+*.rpt
+*.zip
+*.pdf
+*.png
+
+# Allow
+!data/.gitkeep
+!experiments/logs/.gitkeep
+!experiments/models/.gitkeep

@@ -1,0 +1,20 @@
+-f https://download.pytorch.org/whl/torch_stable.html
+-f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html
+torch==1.7.1+cu110
+torchvision==0.8.2+cu110
+torchaudio===0.7.2
+torch-scatter
+torch-sparse
+torch-cluster
+torch-spline-conv
+torch-geometric
+pandas==1.2.2
+epynet==1.1
+dask[array]==2021.2.0
+zarr==2.6.1
+jupyter
+matplotlib
+seaborn
+panel
+plotly
+optuna

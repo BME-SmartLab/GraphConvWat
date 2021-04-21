@@ -1,0 +1,234 @@
+[TITLE]
+Anytown master file for rl-wds 
+
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern         
+ 1               	6.0960      	31.545834   	1               	;
+ 2               	15.2400     	12.618333   	1               	;
+ 3               	15.2400     	12.618333   	1               	;
+ 4               	15.2400     	37.855000   	1               	;
+ 5               	24.3840     	37.855000   	1               	;
+ 6               	24.3840     	37.855000   	1               	;
+ 7               	24.3840     	37.855000   	1               	;
+ 8               	24.3840     	25.236666   	1               	;
+ 9               	36.5760     	25.236666   	1               	;
+ 10              	36.5760     	25.236666   	1               	;
+ 11              	36.5760     	25.236666   	1               	;
+ 12              	15.2400     	31.545834   	1               	;
+ 13              	15.2400     	31.545834   	1               	;
+ 14              	15.2400     	31.545834   	1               	;
+ 15              	15.2400     	31.545834   	1               	;
+ 16              	36.5760     	25.236666   	1               	;
+ 17              	36.5760     	63.091668   	1               	;
+ 18              	15.2400     	31.545834   	1               	;
+ 19              	15.2400     	63.091668   	1               	;
+ 20              	6.0960      	0.000000    	1               	;
+ 21              	15.2400     	0.000000    	1               	;
+ 22              	36.5760     	0.000000    	1               	;
+
+[RESERVOIRS]
+;ID              	Head        	Pattern         
+ 40              	3.0480      	                	;
+
+[TANKS]
+;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
+ 41              	66.5350     	3.0510      	3.0480      	10.6680     	9.9532      	237.0800    	                	;
+ 42              	66.5350     	3.0510      	3.0480      	10.6680     	9.9532      	237.0800    	                	;
+
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ 1               	1               	2               	3657.6001   	304.8000    	120.0000    	0.0000      	Open  	;Res
+ 2               	1               	12              	3657.6001   	304.8000    	70.0000     	0.0000      	Open  	;city
+ 3               	1               	13              	3657.6001   	406.4000    	70.0000     	0.0000      	Open  	;city
+ 4               	1               	20              	30.4800     	762.0000    	130.0000    	0.0000      	Open  	;city
+ 5               	2               	3               	1828.8000   	254.0000    	120.0000    	0.0000      	Open  	;Res
+ 6               	2               	4               	2743.2000   	254.0000    	120.0000    	0.0000      	Open  	;Res
+ 7               	2               	13              	2743.2000   	304.8000    	70.0000     	0.0000      	Open  	;Res
+ 8               	2               	14              	1828.8000   	254.0000    	120.0000    	0.0000      	Open  	;Res
+ 9               	3               	4               	1828.8000   	254.0000    	120.0000    	0.0000      	Open  	;Res
+ 11              	4               	8               	3657.6001   	203.2000    	120.0000    	0.0000      	Open  	;Res
+ 12              	4               	15              	1828.8000   	254.0000    	120.0000    	0.0000      	Open  	;Res
+ 17              	8               	9               	3657.6001   	203.2000    	120.0000    	0.0000      	Open  	;Res
+ 18              	8               	15              	1828.8000   	254.0000    	120.0000    	0.0000      	Open  	;Res
+ 19              	8               	16              	1828.8000   	203.2000    	120.0000    	0.0000      	Open  	;Res
+ 20              	8               	17              	1828.8000   	203.2000    	120.0000    	0.0000      	Open  	;Res
+ 21              	9               	10              	1828.8000   	203.2000    	120.0000    	0.0000      	Open  	;Res
+ 22              	10              	11              	1828.8000   	203.2000    	120.0000    	0.0000      	Open  	;Res
+ 23              	10              	17              	1828.8000   	254.0000    	120.0000    	0.0000      	Open  	;Res
+ 24              	11              	12              	1828.8000   	203.2000    	120.0000    	0.0000      	Open  	;Res
+ 26              	12              	17              	1828.8000   	254.0000    	120.0000    	0.0000      	Open  	;Res
+ 27              	12              	18              	1828.8000   	203.2000    	70.0000     	0.0000      	Open  	;city
+ 28              	13              	14              	1828.8000   	304.8000    	70.0000     	0.0000      	Open  	;city
+ 29              	13              	18              	1828.8000   	304.8000    	70.0000     	0.0000      	Open  	;city
+ 30              	13              	19              	1828.8000   	254.0000    	70.0000     	0.0000      	Open  	;city
+ 31              	14              	15              	1828.8000   	304.8000    	70.0000     	0.0000      	Open  	;city
+ 32              	14              	19              	1828.8000   	254.0000    	70.0000     	0.0000      	Open  	;city
+ 33              	14              	21              	30.4800     	304.8000    	120.0000    	0.0000      	Open  	;city
+ 34              	15              	16              	1828.8000   	254.0000    	70.0000     	0.0000      	Open  	;city
+ 35              	15              	19              	1828.8000   	254.0000    	70.0000     	0.0000      	Open  	;city
+ 36              	16              	17              	1828.8000   	203.2000    	120.0000    	0.0000      	Open  	;Res
+ 37              	16              	18              	1828.8000   	304.8000    	70.0000     	0.0000      	Open  	;city
+ 38              	16              	19              	1828.8000   	254.0000    	70.0000     	0.0000      	Open  	;city
+ 39              	17              	18              	1828.8000   	203.2000    	120.0000    	0.0000      	Open  	;Res
+ 40              	17              	22              	30.4800     	304.8000    	120.0000    	0.0000      	Open  	;Res
+ 41              	18              	19              	1828.8000   	254.0000    	70.0000     	0.0000      	Open  	;city
+ 142             	21              	41              	0.3048      	304.8000    	120.0000    	0.0000      	Open  	;city
+ 143             	22              	42              	0.3048      	304.8000    	120.0000    	0.0000      	Open  	;Res
+ 110             	4               	5               	1828.8000   	203.2000    	130.0000    	0.0000      	Open  	;New, original value: 0.0001
+ 113             	5               	6               	1828.8000   	203.2000    	130.0000    	0.0000      	Open  	;New, original value: 0.0001
+ 114             	6               	7               	1828.8000   	203.2000    	130.0000    	0.0000      	Open  	;New, original value: 0.0001
+ 115             	6               	8               	1828.8000   	203.2000    	130.0000    	0.0000      	Open  	;New, original value: 0.0001
+ 116             	7               	8               	1828.8000   	203.2000    	130.0000    	0.0000      	Open  	;New, original value: 0.0001
+ 125             	11              	17              	2743.2000   	203.2000    	130.0000    	0.0000      	Open  	;New, original value: 0.0001
+
+[PUMPS]
+;ID              	Node1           	Node2           	Parameters
+ 78g1            	40              	20              	HEAD H1	;
+ 79g1            	40              	20              	HEAD H1	;
+
+[VALVES]
+;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss   
+
+[TAGS]
+
+[DEMANDS]
+;Junction        	Demand      	Pattern         	Category
+
+[STATUS]
+;ID              	Status/Setting
+
+[PATTERNS]
+;ID              	Multipliers
+;
+ 1               	1.0000      	1.0000      	1.0000      	1.0000      	1.0000      	1.0000      
+;
+ 4               	0.0000      	0.0000      	0.0000      	0.0000      	0.0000      	0.0000      
+
+[CURVES]
+;ID              	X-Value     	Y-Value
+;PUMP: 
+ H1              	0.0000      	91.4400     
+ H1              	126.1833    	89.0000     
+ H1              	252.3667    	82.2960     
+ H1              	378.5500    	70.1040     
+ H1              	504.7333    	55.1690     
+ H1              	805.5556    	0.0000      
+;PUMP: 
+ E1              	0.0000      	0.0000      
+ E1              	126.1833    	0.5000      
+ E1              	252.3667    	0.6500      
+ E1              	378.5500    	0.5500      
+ E1              	504.7333    	0.4000      
+ E1              	805.5556    	0.0000      
+
+[CONTROLS]
+
+
+[RULES]
+
+
+[ENERGY]
+ Global Efficiency  	75.0000
+ Global Price       	0
+ Demand Charge      	0.0000
+
+[EMITTERS]
+;Junction        	Coefficient
+
+[QUALITY]
+;Node            	InitQual
+
+[SOURCES]
+;Node            	Type        	Quality     	Pattern
+
+[REACTIONS]
+;Type     	Pipe/Tank       	Coefficient
+
+
+[REACTIONS]
+ Order Bulk            	1.00
+ Order Tank            	1.00
+ Order Wall            	1
+ Global Bulk           	0.000000
+ Global Wall           	0.000000
+ Limiting Potential    	0
+ Roughness Correlation 	0
+
+[MIXING]
+;Tank            	Model
+
+[TIMES]
+ Duration           	0:00 
+ Hydraulic Timestep 	0:01 
+ Quality Timestep   	0:01 
+ Pattern Timestep   	1:00 
+ Pattern Start      	0:00 
+ Report Timestep    	1:00 
+ Report Start       	0:00 
+ Start ClockTime    	18:00:00
+ Statistic          	NONE
+
+[REPORT]
+ Status             	No
+ Summary            	No
+ Page               	0
+
+[OPTIONS]
+ Units              	LPS
+ Headloss           	H-W
+ Specific Gravity   	1.000000
+ Viscosity          	1.000000
+ Trials             	200
+ Accuracy           	0.00100000
+ CHECKFREQ          	2
+ MAXCHECK           	10
+ DAMPLIMIT          	0.00000000
+ Unbalanced         	STOP
+ Pattern            	1
+ Demand Multiplier  	1.0000
+ Emitter Exponent   	0.5000
+ Quality            	NONE mg/L
+ Diffusivity        	1.000000
+ Tolerance          	0.01000000
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ 1               	7682.33         	3371.15         
+ 2               	7633.71         	5737.44         
+ 3               	7520.26         	7293.35         
+ 4               	6175.04         	7568.88         
+ 5               	5591.57         	8460.29         
+ 6               	4100.49         	8071.31         
+ 7               	3192.87         	7763.37         
+ 8               	3321.19         	6696.55         
+ 9               	1305.62         	4850.97         
+ 10              	2317.45         	3588.20         
+ 11              	3701.63         	2892.06         
+ 12              	4846.03         	3354.94         
+ 13              	6450.57         	4424.64         
+ 14              	6466.77         	5769.85         
+ 15              	5094.45         	6482.09         
+ 16              	4017.86         	5615.96         
+ 17              	3005.49         	4292.43         
+ 18              	4846.03         	4440.84         
+ 19              	5332.25         	5332.25         
+ 20              	8544.18         	3371.15         
+ 21              	6094.00         	6499.19         
+ 22              	2422.68         	4519.09         
+ 40              	8700.60         	3371.15         
+ 41              	6094.00         	6600.19         
+ 42              	2422.68         	4700.09         
+
+[VERTICES]
+;Link            	X-Coord         	Y-Coord
+
+[LABELS]
+;X-Coord           Y-Coord          Label & Anchor Node
+
+[BACKDROP]
+ DIMENSIONS     	935.87          	2613.65         	9070.35         	8738.70         
+ UNITS          	None
+ FILE           	
+ OFFSET         	0.00            	0.00            
+
+[END]

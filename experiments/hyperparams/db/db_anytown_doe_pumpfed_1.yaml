@@ -1,0 +1,25 @@
+wds : anytown
+nScenes : 1000
+genAlgo : doe
+
+chunks:
+    height  : 1000
+    width   : null
+
+demand:
+    nodalLo : .7
+    nodalHi : 1.3
+    totalLo : .3
+    totalHi : 1.1
+
+pumpSpeed:
+    limitLo : .9
+    limitHi : 1.4
+
+feed:
+    gravityFedProba : 0
+    pumpOffProba    : 0
+
+data:
+    vldSplit    : 0.2
+    tstSplit    : 0.2
