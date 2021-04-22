@@ -19,9 +19,14 @@ parser.add_argument(
     type    = str
     )
 parser.add_argument(
-    '--sensor_proba',
+    '--obsrat',
     default = .0,
     type    = float
+    )
+parser.add_argument(
+    '--seed',
+    default = None,
+    type    = int
     )
 parser.add_argument(
     '--savepdf',
@@ -95,18 +100,19 @@ lc = mc.LineCollection(pump_collection, linewidths=1, color='k')
 ax.add_collection(lc)
 
 cmap    = plt.get_cmap('plasma')
-juncs['head']   *= 1.5 # better-looking pressure distribution
+juncs['head']   *= 1.5 # emphasize differences in graphical abstract
 colors  = []
 signal  = []
 for _, junc in juncs.iterrows():
-    if np.random.rand() < args.sensor_proba:
+    np.random.seed(args.seed)
+    if np.random.rand() < args.obsrat:
         color = cmap(junc['head'])
         signal.append(junc['head'])
     else:
         color = (1.,1.,1.,1.)
         signal.append(np.nan)
     colors.append(color)
-    ax.plot(junc['x'], junc['y'], 'ko', mfc=color, mec='k')
+    ax.plot(junc['x'], junc['y'], 'ko', mfc=color, mec='k', ms=15)
 for _, tank in tanks.iterrows():
     ax.plot(tank['x'], tank['y'], marker=7, mfc='k', mec='k', ms=10)
 for _, reservoir in reservoirs.iterrows():
@@ -114,10 +120,10 @@ for _, reservoir in reservoirs.iterrows():
 ax.plot(pumps['center_x'], pumps['center_y'], 'ko', ms=13, mfc='white')
 for _, pump in pumps.iterrows():
     ax.plot(pump['center_x'], pump['center_y'],
-            marker=(3, 0, pump['orient']),
-            color='k',
-            ms=10
-           )
+        marker=(3, 0, pump['orient']),
+        color='k',
+        ms=10
+        )
 ax.autoscale()
 ax.axis('off')
 plt.tight_layout()
@@ -132,10 +138,12 @@ if args.savepdf:
 else:
     plt.show()
 
-signal  = np.expand_dims(juncs['head'], axis=1)
+signal  = np.expand_dims(np.array(signal).T, axis=1)
 ax  = sns.heatmap(
     signal,
-    cmap    = colors,
+    vmin    = 0.,
+    vmax    = 1.,
+    cmap    = 'plasma',
     cbar    = False,
     square  = True,
     linewidth   = 1,
