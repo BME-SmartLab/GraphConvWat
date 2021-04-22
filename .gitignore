@@ -1,4 +1,5 @@
 # Ignore
+.ipynb_checkpoints
 data/*
 experiments/logs/*
 experiments/models/*
