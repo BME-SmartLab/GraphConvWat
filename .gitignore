@@ -1,5 +1,6 @@
 # Ignore
 .ipynb_checkpoints
+__pycache__
 data/*
 experiments/logs/*
 experiments/models/*

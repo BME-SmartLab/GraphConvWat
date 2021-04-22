@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import argparse
 import os
+import argparse
 import numpy as np
 from scipy import sparse
 import networkx as nx
@@ -10,6 +10,8 @@ from matplotlib.colors import LogNorm
 import seaborn as sns
 import torch_geometric as pyg
 
+import sys
+sys.path.insert(0, os.path.join('..', 'utils'))
 from graph_utils import get_nx_graph
 
 # ----- ----- ----- ----- ----- -----
