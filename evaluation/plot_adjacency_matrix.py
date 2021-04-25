@@ -74,6 +74,7 @@ vmin    = L_star[L_star.nonzero()].min()
 vmax    = L_star.max()
 L_star[L_star == 0] = np.nan
 
+sns.set(font_scale=1.75, style='whitegrid')
 figsize = (8,6)
 axlabel = "Node number"
 barlabel = "Value of the Laplacian"
@@ -81,6 +82,8 @@ fig, ax = plt.subplots(figsize=figsize)
 hmap    = sns.heatmap(L_star,
     norm    = LogNorm(vmin = vmin, vmax = vmax),
     cmap    = 'viridis',
+    #linewidth   = .1,
+    #linecolor   = 'k',
     cbar_kws= {'label': barlabel},
     square  = True,
     ax      = ax
@@ -93,7 +96,7 @@ hmap.set_ylabel(axlabel)
 # ----- ----- ----- ----- ----- -----
 if args.savepdf:
     fmt     = 'pdf'
-    fname   = 'adj-'+args.wds+'-'+args.adj+'.'+fmt
+    fname   = 'laplace-'+args.wds+'-'+args.adj+'.'+fmt
     fig.savefig(fname, format=fmt, bbox_inches='tight')
 else:
     plt.show()

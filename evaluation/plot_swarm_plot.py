@@ -62,8 +62,8 @@ fig = sns.swarmplot(
     hue = 'params_n_layers',
     order   = ['binary', 'weighted', 'logarithmic']
     )
-fig.set_xlabel('Adjacency matrix')
-fig.set_ylabel('Loss')
+fig.set_xlabel('adjacency matrix')
+fig.set_ylabel('loss')
 fig.set_ylim([args.ymin, args.ymax])
 plt.legend(loc='center left', title='layers')
 
