@@ -12,7 +12,6 @@ experiments/models/*
 *.rpt
 *.zip
 *.pdf
-*.png
 *.csv
 
 # Allow

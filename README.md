@@ -1,3 +1,5 @@
+![](GraphConvWat-model.png)
+
 # GraphConvWat -- Graph Convolution on Water Networks
 GitHub repository for the paper: "Reconstructing nodal pressure in water distribution systems with graph neural networks". (under submission, preprint available at arXiv: [https://arxiv.org/abs/2104.13619](https://arxiv.org/abs/2104.13619))
 
