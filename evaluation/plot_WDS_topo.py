@@ -54,24 +54,26 @@ def get_node_df(elements, get_head=False):
     return data
 
 def get_elem_df(elements, nodes):
-    data = []
-    for elem in elements:
-        ser = pd.Series({
-            'uid': elem.uid,
-            'x1': nodes.loc[nodes['uid'] == elem.from_node.uid, 'x'].values,
-            'y1': nodes.loc[nodes['uid'] == elem.from_node.uid, 'y'].values,
-            'x2': nodes.loc[nodes['uid'] == elem.to_node.uid, 'x'].values,
-            'y2': nodes.loc[nodes['uid'] == elem.to_node.uid, 'y'].values,
-        })
-        data.append(ser)
+    data= []
     df = pd.DataFrame(data)
-    df['x1'] = df['x1'].str[0]
-    df['y1'] = df['y1'].str[0]
-    df['x2'] = df['x2'].str[0]
-    df['y2'] = df['y2'].str[0]
-    df['center_x'] = (df['x1']+df['x2']) / 2
-    df['center_y'] = (df['y1']+df['y2']) / 2
-    df['orient'] = np.degrees(np.arctan((df['y2']-df['y1'])/(df['x2']-df['x1']))) + 90
+    if elements:
+        for elem in elements:
+            ser = pd.Series({
+                'uid': elem.uid,
+                'x1': nodes.loc[nodes['uid'] == elem.from_node.uid, 'x'].values,
+                'y1': nodes.loc[nodes['uid'] == elem.from_node.uid, 'y'].values,
+                'x2': nodes.loc[nodes['uid'] == elem.to_node.uid, 'x'].values,
+                'y2': nodes.loc[nodes['uid'] == elem.to_node.uid, 'y'].values,
+            })
+            data.append(ser)
+        df = pd.DataFrame(data)
+        df['x1'] = df['x1'].str[0]
+        df['y1'] = df['y1'].str[0]
+        df['x2'] = df['x2'].str[0]
+        df['y2'] = df['y2'].str[0]
+        df['center_x'] = (df['x1']+df['x2']) / 2
+        df['center_y'] = (df['y1']+df['y2']) / 2
+        df['orient'] = np.degrees(np.arctan((df['y2']-df['y1'])/(df['x2']-df['x1']))) + 90
     return df
 
 def build_lc_from(df):
@@ -93,15 +95,18 @@ pumps = get_elem_df(wds.pumps, nodes)
 valves= get_elem_df(wds.valves, nodes)
 pipe_collection = build_lc_from(pipes)
 pump_collection = build_lc_from(pumps)
-valve_collection = build_lc_from(valves)
+if not valves.empty:
+    valve_collection = build_lc_from(valves)
 
+mew = .5
 fig, ax = plt.subplots()
-lc = mc.LineCollection(pipe_collection, linewidths=1, color='k')
+lc = mc.LineCollection(pipe_collection, linewidths=mew, color='k')
 ax.add_collection(lc)
-lc = mc.LineCollection(pump_collection, linewidths=1, color='k')
+lc = mc.LineCollection(pump_collection, linewidths=mew, color='k')
 ax.add_collection(lc)
-lc = mc.LineCollection(valve_collection, linewidths=1, color='k')
-ax.add_collection(lc)
+if not valves.empty:
+    lc = mc.LineCollection(valve_collection, linewidths=mew, color='k')
+    ax.add_collection(lc)
 
 cmap    = plt.get_cmap('plasma')
 juncs['head']   *= 1.5 # emphasize differences in graphical abstract
@@ -116,17 +121,17 @@ for _, junc in juncs.iterrows():
         color = (1.,1.,1.,1.)
         signal.append(np.nan)
     colors.append(color)
-    ax.plot(junc['x'], junc['y'], 'ko', mfc=color, mec='k', ms=15)
+    ax.plot(junc['x'], junc['y'], 'ko', mfc=color, mec='k', ms=3, mew=mew)
 for _, tank in tanks.iterrows():
-    ax.plot(tank['x'], tank['y'], marker=7, mfc='k', mec='k', ms=10)
+    ax.plot(tank['x'], tank['y'], marker=7, mfc='k', mec='k', ms=7, mew=mew)
 for _, reservoir in reservoirs.iterrows():
-    ax.plot(reservoir['x'], reservoir['y'], marker='o', mfc='k', mec='k', ms=7)
-ax.plot(pumps['center_x'], pumps['center_y'], 'ko', ms=13, mfc='white')
+    ax.plot(reservoir['x'], reservoir['y'], marker='o', mfc='k', mec='k', ms=3, mew=mew)
+ax.plot(pumps['center_x'], pumps['center_y'], 'ko', ms=7, mfc='white', mew=mew)
 for _, pump in pumps.iterrows():
     ax.plot(pump['center_x'], pump['center_y'],
         marker=(3, 0, pump['orient']),
         color='k',
-        ms=10
+        ms=5
         )
 ax.autoscale()
 ax.axis('off')
