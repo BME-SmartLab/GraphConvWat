@@ -1,0 +1,22 @@
+name: graco
+channels:
+  - pytorch
+  - nvidia
+dependencies:
+  - python=3.8
+  - pytorch
+  - torchvision
+  - torchaudio
+  - cudatoolkit=11.1
+  - dask
+  - pandas
+  - pip
+  - pyyaml
+  - wheel
+  - zarr
+  - pip:
+    - epynet
+    - optuna
+    - pyDOE2
+    - ray
+    - torchinfo
