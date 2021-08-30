@@ -9,6 +9,7 @@ dependencies:
   - torchaudio
   - cudatoolkit=11.1
   - dask
+  - jupyter
   - pandas
   - pip
   - pyyaml
