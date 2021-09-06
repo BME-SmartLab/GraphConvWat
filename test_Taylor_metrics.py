@@ -5,6 +5,7 @@ from csv import writer
 import numpy as np
 import dask.array as da
 import pandas as pd
+import networkx as nx
 import torch
 import torch.nn.functional as F
 from torch_geometric.data import Data, DataLoader
@@ -51,6 +52,7 @@ parser.add_argument('--adj',
                     )
 parser.add_argument('--model',
                     default = 'orig',
+                    choices = ['orig', 'naive', 'gcn', 'interp'],
                     type    = str,
                     help    = "Model to use."
                     )
@@ -139,6 +141,47 @@ def predict_nodal_p_naive(dta_ldr, num_nodes, num_graphs):
         end_idx += batch.num_graphs
     return da.array(nodal_pressures)
 
+def predict_nodal_p_interpolation(G, X):
+    L   = nx.linalg.laplacianmatrix.laplacian_matrix(G).todense()
+    S   = np.array(L)
+    F   = X[:,:,0].copy()
+    X_h = X[:,:,0].copy()
+    flag_observed   = X[:,:,1][0,:]
+
+    k   = 0
+    for i, flag in enumerate(flag_observed):
+        if flag:
+            pivot   = np.copy(S[:,i])
+            S[:,i]  = S[:,k]
+            S[:,k]  = pivot
+
+            S[i,:]  = S[k,:]
+            S[k,:]  = pivot.T
+
+            pivot   = np.copy(F[:,i])
+            F[:,i]  = F[:,k]
+            F[:,k]  = pivot
+
+            k   += 1
+
+    F   = F[:, :k]
+    S_2 = S[:k, k:]
+    S_3 = S[k:, k:]
+    try:
+        S_3_inv = np.linalg.inv(S_3)
+    except:
+        S_3_inv = np.linalg.pinv(S_3)
+
+    F_h = -np.dot(S_3_inv, np.dot(S_2.T, F.T)).T
+    k   = 0
+    for i, flag in enumerate(flag_observed):
+        if not flag:
+            X_h[:,i]    = F_h[:,k]
+            k           += 1
+
+    nodal_pressures = da.array(X_h)
+    return nodal_pressures
+
 def load_model():
     if args.wds == 'anytown':
         from model.anytown import ChebNet as Net
@@ -169,16 +212,22 @@ tst_x, _, _ = reader.read_data(
     rescale = 'standardize',
     cover   = True
     )
-tst_y, _, _ = reader.read_data(
+tst_y, bias_y, scale_y = reader.read_data(
     dataset = 'tst',
     varname = 'junc_heads',
     rescale = 'normalize',
     cover   = False
     )
-_, bias_y, scale_y  = reader.read_data(
-    dataset = 'trn',
+tst_x_unscaled, _, _ = reader.read_data(
+    dataset = 'tst',
     varname = 'junc_heads',
-    rescale = 'normalize',
+    rescale = None,
+    cover   = True
+    )
+tst_y_unscaled, _, _ = reader.read_data(
+    dataset = 'tst',
+    varname = 'junc_heads',
+    rescale = None,
     cover   = False
     )
 tst_ldr = build_dataloader(G, tst_x, tst_y, args.batch, shuffle=False)
@@ -200,12 +249,16 @@ elif args.model == 'gcn':
     Net = load_model()
     model   = Net(np.shape(tst_x)[-1], np.shape(tst_y)[-1]).to(device)
     p_hat   = predict_nodal_p_gcn(tst_ldr, num_nodes, num_graphs)
+elif args.model == 'interp':
+    p_hat   = predict_nodal_p_interpolation(G, tst_x_unscaled)
 msec, sigma = compute_metrics(p, p_hat)
+print(msec.compute())
+print(sigma.compute())
 
 # ----- ----- ----- ----- ----- -----
 # Write metrics
 # ----- ----- ----- ----- ----- -----
-results = [run_stamp, msec.compute(), sigma.compute()]
-with open(pathToResults, 'a+') as fout:
-    csv_writer  = writer(fout)
-    csv_writer.writerow(results)
+#results = [run_stamp, msec.compute(), sigma.compute()]
+#with open(pathToResults, 'a+') as fout:
+#    csv_writer  = writer(fout)
+#    csv_writer.writerow(results)
