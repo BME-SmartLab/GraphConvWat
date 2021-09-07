@@ -82,6 +82,13 @@ if args.individual:
             (df['model'] == model)]
         gcn_sigma   = df_plot['sigma_pred'].to_numpy()/std_ref
         gcn_rho     = df_plot['corr_coeff'].to_numpy()
+        model   = 'interp'
+        df_plot = df.loc[
+            (df['wds'] == wds) &
+            (df['obs_rat'] == obs_rat) &
+            (df['model'] == model)]
+        interp_sigma = df_plot['sigma_pred'].to_numpy()/std_ref
+        interp_rho   = df_plot['corr_coeff'].to_numpy()
     
         pt_alpha    = .5
         fill_alpha  = .2
@@ -97,6 +104,15 @@ if args.individual:
             )
         dia.add_sample(naive_sigma, naive_rho,
             marker  = 's',
+            ms  = 5,
+            ls  = '',
+            mfc = color,
+            mec = 'none',
+            alpha   = pt_alpha,
+            #label   = 'naive-'+str(obs_rat)
+            )
+        dia.add_sample(interp_sigma, interp_rho,
+            marker  = '*',
             ms  = 5,
             ls  = '',
             mfc = color,
@@ -126,7 +142,6 @@ if not args.nocenter:
             (df['model'] == model)]
         gcn_sigma   = df_plot['sigma_pred'].to_numpy()/std_ref
         gcn_rho     = df_plot['corr_coeff'].to_numpy()
-
         dia.add_sample(gcn_sigma.mean(), gcn_rho.mean(),
             marker  = 'o',
             ms  = 10,
@@ -136,6 +151,7 @@ if not args.nocenter:
             mew = 3,
             label   = 'GraphConvWat@OR='+str(obs_rat)
             )
+
     for i, obs_rat in enumerate(obs_ratios):
         model   = 'naive'
         df_plot = df.loc[
@@ -152,6 +168,24 @@ if not args.nocenter:
             mec = cmap(i),
             mew = 3,
             label   = 'Naive model@OR='+str(obs_rat)
+            )
+
+    for i, obs_rat in enumerate(obs_ratios):
+        model   = 'interp'
+        df_plot = df.loc[
+            (df['wds'] == wds) &
+            (df['obs_rat'] == obs_rat) &
+            (df['model'] == model)]
+        naive_sigma = df_plot['sigma_pred'].to_numpy()/std_ref
+        naive_rho   = df_plot['corr_coeff'].to_numpy()
+        dia.add_sample(naive_sigma.mean(), naive_rho.mean(),
+            marker  = '*',
+            ms  = 10,
+            ls  = '',
+            mfc = 'none',
+            mec = cmap(i),
+            mew = 3,
+            label   = 'Unsupervised method@OR='+str(obs_rat)
             )
 
 contours = dia.add_contours(levels=6, colors='0.5', linestyles='dashed', alpha=.8, linewidths=1)
