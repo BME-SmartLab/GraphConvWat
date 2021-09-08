@@ -28,6 +28,10 @@ parser.add_argument(
     type    = float
     )
 parser.add_argument(
+    '--legend',
+    action  = 'store_true'
+    )
+parser.add_argument(
     '--fill',
     action  = 'store_true'
     )
@@ -195,9 +199,16 @@ dia.add_grid()
 dia._ax.axis[:].major_ticks.set_tick_out(True)
 dia._ax.axis['left'].label.set_text('Normalized standard deviation')
 
-fig.legend(dia.samplePoints,
-           [p.get_label() for p in dia.samplePoints],
-           numpoints=1, prop=dict(size='small'), loc='upper right', framealpha=.5)
+if args.legend:
+    fig_leg = plt.figure()
+    fig_leg.legend(
+        dia.samplePoints,
+        [p.get_label() for p in dia.samplePoints],
+        numpoints=1, prop=dict(size='small'), loc='upper right', framealpha=.5
+        )
+    fmt     = 'pdf'
+    fname   = 'taylor-legend.'+fmt
+    fig_leg.savefig(fname, format=fmt)
 fig.tight_layout()
 
 # ----- ----- ----- ----- ----- -----
@@ -205,7 +216,7 @@ fig.tight_layout()
 # ----- ----- ----- ----- ----- -----
 if args.savepdf:
     fmt     = 'pdf'
-    fname   = 'Taylor-'+args.wds+'.'+fmt
+    fname   = 'taylor-'+args.wds+'.'+fmt
     fig.savefig(fname, format=fmt)
 else:
     plt.show()
