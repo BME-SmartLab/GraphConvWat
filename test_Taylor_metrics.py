@@ -16,6 +16,7 @@ from utils.graph_utils import get_nx_graph
 from utils.DataReader import DataReader
 from utils.Metrics import Metrics
 from utils.MeanPredictor import MeanPredictor
+from utils.unsupervised_methods import linear_regression
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -141,50 +142,6 @@ def predict_nodal_p_naive(dta_ldr, num_nodes, num_graphs):
         end_idx += batch.num_graphs
     return da.array(nodal_pressures)
 
-def predict_nodal_p_interpolation(G, X):
-    L   = nx.linalg.laplacianmatrix.laplacian_matrix(G).todense()
-    S   = np.array(L)
-    F   = X[:,:,0].copy()
-    X_h = X[:,:,0].copy()
-    flag_observed   = X[:,:,1][0,:]
-
-    k   = 0
-    for i, flag in enumerate(flag_observed):
-        if flag:
-            pivot   = np.copy(S[:,i])
-            S[:,i]  = S[:,k]
-            S[:,k]  = pivot
-
-            S[i,:]  = S[k,:]
-            S[k,:]  = pivot.T
-
-            pivot   = np.copy(F[:,i])
-            F[:,i]  = F[:,k]
-            F[:,k]  = pivot
-
-            k   += 1
-
-    F   = F[:, :k]
-    S_2 = S[:k, k:]
-    S_3 = S[k:, k:]
-    try:
-        S_3_inv = np.linalg.inv(S_3)
-    except:
-        S_3_inv = np.linalg.pinv(S_3)
-
-    F_h = np.dot(S_3_inv, np.dot(S_2.T, F.T))
-    mu  = - np.sum(F_h, axis=0) / np.sum(np.dot(S_3_inv, np.dot(S_2.T, np.ones_like(F.T))), axis=0)
-    F_h = np.dot(S_3_inv, np.dot(S_2.T, F.T+mu)).T
-
-    k   = 0
-    for i, flag in enumerate(flag_observed):
-        if not flag:
-            X_h[:,i]    = F_h[:,k]
-            k           += 1
-
-    nodal_pressures = da.add(da.multiply(da.array(X_h), scale_std), bias_std)
-    return nodal_pressures
-
 def load_model():
     if args.wds == 'anytown':
         from model.anytown import ChebNet as Net
@@ -207,6 +164,7 @@ def compute_metrics(p, p_hat):
 # ----- ----- ----- ----- ----- -----
 wds = Network(pathToWDS)
 G   = get_nx_graph(wds, mode=args.adj)
+L   = nx.linalg.laplacianmatrix.laplacian_matrix(G).todense()
 seed    = run_id
 reader  = DataReader(pathToDB, n_junc=len(wds.junctions.uid), obsrat=args.obsrat, seed=seed)
 tst_x, bias_std, scale_std  = reader.read_data(
@@ -242,7 +200,9 @@ elif args.model == 'gcn':
     model   = Net(np.shape(tst_x)[-1], np.shape(tst_y)[-1]).to(device)
     p_hat   = predict_nodal_p_gcn(tst_ldr, num_nodes, num_graphs)
 elif args.model == 'interp':
-    p_hat   = predict_nodal_p_interpolation(G, tst_x)
+    p_hat   = linear_regression(L, tst_x)
+    p_hat   = p_hat*scale_std+bias_std
+    p_hat   = da.array(p_hat)
 msec, sigma = compute_metrics(p, p_hat)
 
 # ----- ----- ----- ----- ----- -----
