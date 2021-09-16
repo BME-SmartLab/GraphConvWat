@@ -16,7 +16,7 @@ from utils.graph_utils import get_nx_graph
 from utils.DataReader import DataReader
 from utils.Metrics import Metrics
 from utils.MeanPredictor import MeanPredictor
-from utils.unsupervised_methods import linear_regression
+from utils.baselines import interpolated_regularization
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -200,7 +200,7 @@ elif args.model == 'gcn':
     model   = Net(np.shape(tst_x)[-1], np.shape(tst_y)[-1]).to(device)
     p_hat   = predict_nodal_p_gcn(tst_ldr, num_nodes, num_graphs)
 elif args.model == 'interp':
-    p_hat   = linear_regression(L, tst_x)
+    p_hat   = interpolated_regularization(L, tst_x)
     p_hat   = p_hat*scale_std+bias_std
     p_hat   = da.array(p_hat)
 msec, sigma = compute_metrics(p, p_hat)
