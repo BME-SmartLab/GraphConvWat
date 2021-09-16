@@ -181,7 +181,6 @@ tst_y, bias_nrm, scale_nrm  = reader.read_data(
     )
 tst_ldr = build_dataloader(G, tst_x, tst_y, args.batch, shuffle=False)
 metrics_nrm = Metrics(bias_nrm, scale_nrm, device)
-metrics_std = Metrics(bias_std, scale_std, device)
 num_nodes   = len(wds.junctions)
 num_graphs  = len(tst_x)
 
@@ -191,6 +190,7 @@ num_graphs  = len(tst_x)
 run_stamp   = run_stamp+'-'+args.model
 print(run_stamp)
 p   = restore_real_nodal_p(tst_ldr, num_nodes, num_graphs)
+
 if args.model == 'orig':
     p_hat   = p
 elif args.model == 'naive':
@@ -203,6 +203,7 @@ elif args.model == 'interp':
     p_hat   = interpolated_regularization(L, tst_x)
     p_hat   = p_hat*scale_std+bias_std
     p_hat   = da.array(p_hat)
+
 msec, sigma = compute_metrics(p, p_hat)
 
 # ----- ----- ----- ----- ----- -----
