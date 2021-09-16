@@ -18,6 +18,11 @@ parser.add_argument(
     type    = str
     )
 parser.add_argument(
+    '--extend',
+    default = None,
+    type    = float
+    )
+parser.add_argument(
     '--smin',
     default = 0,
     type    = float
@@ -64,7 +69,7 @@ std_ref = df.loc[
 # Plot assembly
 # ----- ----- ----- ----- ----- -----
 fig = plt.figure()
-dia = TaylorDiagram(std_ref/std_ref, fig=fig, label='reference', extend=False, srange=(args.smin, args.smax))
+dia = TaylorDiagram(std_ref/std_ref, fig=fig, label='reference', extend=args.extend, srange=(args.smin, args.smax))
 dia.samplePoints[0].set_color('r')
 dia.samplePoints[0].set_marker('P')
 cmap    = plt.get_cmap('tab10')

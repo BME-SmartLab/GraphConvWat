@@ -6,6 +6,8 @@ Taylor diagram (Taylor, 2001) implementation.
 
 Note: If you have found these software useful for your research, I would
 appreciate an acknowledgment.
+
+Modified by Gergely Hajgató@2021-09-16.
 """
 
 __version__ = "Time-stamp: <2018-12-06 11:43:41 ycopin>"
@@ -25,7 +27,7 @@ class TaylorDiagram(object):
     """
 
     def __init__(self, refstd,
-                 fig=None, rect=111, label='_', srange=(0, 1.5), extend=False):
+                 fig=None, rect=111, label='_', srange=(0, 1.5), extend=None):
         """
         Set up Taylor diagram axes, i.e. single quadrant polar
         plot, using `mpl_toolkits.axisartist.floating_axes`.
@@ -52,7 +54,8 @@ class TaylorDiagram(object):
         rlocs = NP.array([0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1])
         if extend:
             # Diagram extended to negative correlations
-            self.tmax = NP.pi
+            assert (extend <= 2) and (extend > 1)
+            self.tmax = extend * NP.pi/2
             rlocs = NP.concatenate((-rlocs[:0:-1], rlocs))
         else:
             # Diagram limited to positive correlations
@@ -89,7 +92,7 @@ class TaylorDiagram(object):
         ax.axis["right"].set_axis_direction("top")    # "Y-axis"
         ax.axis["right"].toggle(ticklabels=True)
         ax.axis["right"].major_ticklabels.set_axis_direction(
-            "bottom" if extend else "left")
+            "bottom" if extend>1.5 else "left")
 
         if self.smin:
             ax.axis["bottom"].toggle(ticklabels=False, label=False)
@@ -216,7 +219,7 @@ def test2():
 
     fig = PLT.figure()
 
-    dia = TaylorDiagram(stdref, fig=fig, label='Reference', extend=True)
+    dia = TaylorDiagram(stdref, fig=fig, label='Reference', extend=2)
     dia.samplePoints[0].set_color('r')  # Mark reference point as a red star
 
     # Add models to Taylor diagram
