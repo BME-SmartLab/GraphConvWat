@@ -92,7 +92,7 @@ class TaylorDiagram(object):
         ax.axis["right"].set_axis_direction("top")    # "Y-axis"
         ax.axis["right"].toggle(ticklabels=True)
         ax.axis["right"].major_ticklabels.set_axis_direction(
-            "bottom" if extend>1.5 else "left")
+            "bottom" if (extend and extend>1.5) else "left")
 
         if self.smin:
             ax.axis["bottom"].toggle(ticklabels=False, label=False)
