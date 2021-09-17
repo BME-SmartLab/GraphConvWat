@@ -194,7 +194,7 @@ if not args.nocenter:
             mfc = 'none',
             mec = cmap(i),
             mew = 3,
-            label   = 'Unsupervised method@OR='+str(obs_rat)
+            label   = 'Interpolated regularization@OR='+str(obs_rat)
             )
 
 contours = dia.add_contours(levels=6, colors='0.5', linestyles='dashed', alpha=.8, linewidths=1)
