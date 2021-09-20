@@ -202,9 +202,6 @@ elif args.model == 'gcn':
 elif args.model == 'interp':
     p_hat   = interpolated_regularization(L, tst_x)
     p_hat   = p_hat*scale_std+bias_std
-    print(p[:3,:].compute())
-    print(p_hat[:3,:])
-    raise
     p_hat   = da.array(p_hat)
 
 msec, sigma = compute_metrics(p, p_hat)
