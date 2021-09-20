@@ -184,6 +184,7 @@ if not args.nocenter:
         df_plot = df.loc[
             (df['wds'] == wds) &
             (df['obs_rat'] == obs_rat) &
+            (df['adjacency'] == 'weighted') &
             (df['model'] == model)]
         naive_sigma = df_plot['sigma_pred'].to_numpy()/std_ref
         naive_rho   = df_plot['corr_coeff'].to_numpy()
