@@ -69,3 +69,15 @@ def get_nx_graph(wds, mode='binary'):
             if (valve.from_node.index in junc_list) and (valve.to_node.index in junc_list):
                 G.add_edge(valve.from_node.index, valve.to_node.index, weight=0., length=0.)
     return G
+
+def get_sensitivity_matrix(wds, perturbance):
+    wds.solve()
+    base_demands    = wds.junctions.basedemand
+    base_heads      = wds.junctions.head
+    S   = np.empty(shape=(len(wds.junctions), len(wds.junctions)), dtype=np.float64)
+    for i, junc in enumerate(wds.junctions):
+        wds.junctions.basedemand    = base_demands
+        junc.basedemand += perturbance
+        wds.solve()
+        S[i, :] = (wds.junctions.head-base_heads) / base_heads
+    return S
