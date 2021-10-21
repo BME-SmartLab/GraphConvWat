@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import copy
 import os
 import glob
 import numpy as np
@@ -108,8 +109,9 @@ hyperparams.to_csv(pathToMeta, header=False)
 # ----- ----- ----- ----- ----- -----
 def build_dataloader(G, set_x, set_y, batch_size, shuffle):
     data    = []
+    master_graph    = from_networkx(G)
     for x, y in zip(set_x, set_y):
-        graph   = from_networkx(G)
+        graph   = copy.deepcopy(master_graph)
         graph.x = torch.Tensor(x)
         graph.y = torch.Tensor(y)
         data.append(graph)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import argparse
+import copy
 from csv import writer
 import numpy as np
 import dask.array as da
@@ -99,8 +100,9 @@ pathToResults   =  os.path.join(pathToRoot, 'experiments', args.metricsdb + '.cs
 # ----- ----- ----- ----- ----- -----
 def build_dataloader(G, set_x, set_y, batch_size, shuffle):
     data    = []
+    master_graph    = from_networkx(G)
     for x, y in zip(set_x, set_y):
-        graph   = from_networkx(G)
+        graph   = copy.deepcopy(master_graph)
         graph.x = torch.Tensor(x)
         graph.y = torch.Tensor(y)
         data.append(graph)
