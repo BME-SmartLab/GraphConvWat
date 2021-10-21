@@ -9,17 +9,19 @@ import pandas as pd
 import networkx as nx
 import torch
 import torch.nn.functional as F
-from torch_geometric.data import Data, DataLoader
+from torch_geometric.loader import DataLoader
 from torch_geometric.utils import from_networkx
 from epynet import Network
 
-from utils.graph_utils import get_nx_graph
+from utils.graph_utils import get_nx_graph, get_sensitivity_matrix
 from utils.DataReader import DataReader
+from utils.SensorInstaller import SensorInstaller
 from utils.Metrics import Metrics
 from utils.MeanPredictor import MeanPredictor
 from utils.baselines import interpolated_regularization
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 
 # ----- ----- ----- ----- ----- -----
 # Command line arguments
@@ -30,12 +32,11 @@ parser.add_argument('--wds',
                     type    = str,
                     help    = "Water distribution system."
                     )
-parser.add_argument('--setmet',
-                    default = 'fixrnd',
-                    choices = ['spc', 'fixrnd', 'allrnd'],
+parser.add_argument('--deploy',
+                    default = 'random',
+                    choices = ['random', 'dist', 'hydrodist', 'hds'],
                     type    = str,
-                    help    = "How to setup the transducers."
-                    )
+                    help    = "Method of sensor deployment.")
 parser.add_argument('--obsrat',
                     default = .05,
                     type    = float,
@@ -87,7 +88,7 @@ pathToRoot  = os.path.dirname(os.path.realpath(__file__))
 pathToExps  = os.path.join(pathToRoot, 'experiments')
 pathToLogs  = os.path.join(pathToExps, 'logs')
 run_id      = args.runid
-run_stamp   = wds_name+'-'+args.setmet+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
+run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
 run_stamp   = run_stamp + str(run_id)
 pathToDB    = os.path.join(pathToRoot, 'data', 'db_' + wds_name +'_'+ args.db)
 pathToModel = os.path.join(pathToExps, 'models', run_stamp+'.pt')
@@ -168,7 +169,44 @@ wds = Network(pathToWDS)
 G   = get_nx_graph(wds, mode=args.adj)
 L   = nx.linalg.laplacianmatrix.laplacian_matrix(G).todense()
 seed    = run_id
-reader  = DataReader(pathToDB, n_junc=len(wds.junctions.uid), obsrat=args.obsrat, seed=seed)
+sensor_budget   = int(len(wds.junctions) * args.obsrat)
+print('Deploying {} sensors...\n'.format(sensor_budget))
+
+sensor_shop = SensorInstaller(wds)
+
+if args.deploy == 'random':
+    sensor_shop.deploy_by_random(
+            sensor_budget   = sensor_budget,
+            seed            = seed
+            )
+elif args.deploy == 'dist':
+    sensor_shop.deploy_by_shortest_path(
+            sensor_budget   = sensor_budget,
+            weight_by       = 'length'
+            )
+elif args.deploy == 'hydrodist':
+    sensor_shop.deploy_by_shortest_path(
+            sensor_budget   = sensor_budget,
+            weight_by       = 'iweight'
+            )
+elif args.deploy == 'hds':
+    print('Calculating nodal sensitivity to demand change...\n')
+    ptb = np.max(wds.junctions.basedemand) / 100
+    S   = get_sensitivity_matrix(wds, ptb)
+    sensor_shop.deploy_by_shortest_path_with_sensitivity(
+            sensor_budget       = sensor_budget,
+            sensitivity_matrix  = S,
+            weight_by           = 'iweight'
+            )
+else:
+    print('Sensor deployment technique is unknown.\n')
+    raise
+
+reader  = DataReader(
+            pathToDB,
+            n_junc  = len(wds.junctions),
+            signal_mask = sensor_shop.signal_mask()
+            )
 tst_x, bias_std, scale_std  = reader.read_data(
     dataset = 'tst',
     varname = 'junc_heads',
