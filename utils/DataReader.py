@@ -4,12 +4,15 @@ import numpy as np
 import zarr
 
 class DataReader():
-    def __init__(self, path_to_db=None, n_junc=None, obsrat=.8, seed=None):
+    def __init__(self, path_to_db=None, n_junc=None, obsrat=.8, seed=None, signal_mask=None):
         self.path_to_db = path_to_db
         self.obsrat     = obsrat
         if seed:
             np.random.seed(seed)
-        self._set_fixed_random_setup(n_junc)
+        if signal_mask is None:
+            self._set_fixed_random_setup(n_junc)
+        else:
+            self.obs_ind    = da.from_array(signal_mask)
 
     def _set_fixed_random_setup(self, n_junc):
         obs_ind = np.ones(shape=(n_junc,))
