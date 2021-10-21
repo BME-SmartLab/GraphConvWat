@@ -30,11 +30,6 @@ parser.add_argument('--db',
                     default = 'doe_pumpfed_1',
                     type    = str,
                     help    = "DB.")
-parser.add_argument('--setmet',
-                    default = 'fixrnd',
-                    choices = ['spc', 'fixrnd', 'allrnd'],
-                    type    = str,
-                    help    = "How to setup the transducers.")
 parser.add_argument('--obsrat',
                     default = .1,
                     type    = float,
@@ -84,7 +79,7 @@ pathToExps  = os.path.join(pathToRoot, 'experiments')
 pathToLogs  = os.path.join(pathToExps, 'logs')
 run_id  = 1
 logs    = [f for f in glob.glob(os.path.join(pathToLogs, '*.csv'))]
-run_stamp   = wds_name+'-'+args.setmet+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
+run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
 while os.path.join(pathToLogs, run_stamp + str(run_id)+'.csv') in logs:
     run_id  += 1
 run_stamp   = run_stamp + str(run_id)
@@ -98,7 +93,7 @@ pathToWDS   = os.path.join('water_networks', wds_name+'.inp')
 # ----- ----- ----- ----- ----- -----
 hyperparams = {
         'db': args.db,
-        'setmet': args.setmet,
+        'deploy': args.deploy,
         'obsrat': args.obsrat,
         'adj': args.adj,
         'epoch': args.epoch,
