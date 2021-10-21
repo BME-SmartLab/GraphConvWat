@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
-from torch_geometric.data import Data, DataLoader
+from torch_geometric.loader import DataLoader
 from torch_geometric.utils import from_networkx
 from torch_geometric.nn import ChebConv
 from epynet import Network

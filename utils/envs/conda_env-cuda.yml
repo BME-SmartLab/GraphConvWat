@@ -2,11 +2,14 @@ name: graco
 channels:
   - pytorch
   - nvidia
+  - pyg
+  - conda-forge
 dependencies:
-  - python=3.8
+  - python
   - pytorch
   - torchvision
   - torchaudio
+  - pyg
   - cudatoolkit=11.1
   - dask
   - jupyter
