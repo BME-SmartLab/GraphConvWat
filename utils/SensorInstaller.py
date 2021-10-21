@@ -100,3 +100,14 @@ class SensorInstaller():
                         if path_length == np.max(list(path_lengths.values()))][0]
                     )
         self.sensor_nodes   = sensor_nodes
+
+    def signal_mask(self):
+        signal_mask = np.zeros(shape=(len(self.wds.junctions),), dtype=np.int8)
+        if self.sensor_nodes:
+            for index in list(self.sensor_nodes):
+                signal_mask[
+                    np.where(self.wds.junctions.index.values == index)[0][0]
+                    ]   = 1
+        else:
+            print('Sensors are not installed.')
+        return signal_mask
