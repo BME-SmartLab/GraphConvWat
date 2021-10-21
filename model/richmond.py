@@ -11,13 +11,6 @@ class ChebNet(torch.nn.Module):
         self.conv2 = ChebConv(120, 60, K=120)
         self.conv3 = ChebConv(60, 30, K=20)
         self.conv4 = ChebConv(30, out_channels, K=1, bias=False)
-        torch.nn.init.xavier_normal_(self.conv1.weight)
-        torch.nn.init.zeros_(self.conv1.bias)
-        torch.nn.init.xavier_normal_(self.conv2.weight)
-        torch.nn.init.zeros_(self.conv2.bias)
-        torch.nn.init.xavier_normal_(self.conv3.weight)
-        torch.nn.init.zeros_(self.conv3.bias)
-        torch.nn.init.xavier_normal_(self.conv4.weight)
 
     def forward(self, data):
         x, edge_index, edge_weight  = data.x, data.edge_index, data.weight
