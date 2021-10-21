@@ -2,7 +2,7 @@
 import networkx as nx
 import numpy as np
 
-from graph_utils import get_nx_graph
+from utils.graph_utils import get_nx_graph
 
 class SensorInstaller():
     def __init__(self, wds):

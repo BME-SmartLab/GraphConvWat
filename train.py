@@ -11,8 +11,9 @@ from torch_geometric.utils import from_networkx
 from torch_geometric.nn import ChebConv
 from epynet import Network
 
-from utils.graph_utils import get_nx_graph
+from utils.graph_utils import get_nx_graph, get_sensitivity_matrix
 from utils.DataReader import DataReader
+from utils.SensorInstaller import SensorInstaller
 from utils.Metrics import Metrics
 from utils.EarlyStopping import EarlyStopping
 
@@ -43,6 +44,11 @@ parser.add_argument('--adj',
                     choices = ['binary', 'weighted', 'logarithmic', 'pruned'],
                     type    = str,
                     help    = "Type of adjacency matrix.")
+parser.add_argument('--deploy',
+                    default = 'random',
+                    choices = ['random', 'dist', 'hydrodist', 'hds'],
+                    type    = str,
+                    help    = "Method of sensor deployment.")
 parser.add_argument('--epoch',
                     default = '1',
                     type    = int,
@@ -58,7 +64,7 @@ parser.add_argument('--lr',
 parser.add_argument('--decay',
                     default = 0.000006,
                     type    = float,
-                    help    = "Weight deca.")
+                    help    = "Weight decay.")
 parser.add_argument('--tag',
                     default = 'def',
                     type    = str,
@@ -170,7 +176,45 @@ if args.deterministic:
     seed    = run_id
 else:
     seed    = None
-reader  = DataReader(pathToDB, n_junc=len(wds.junctions.uid), obsrat=args.obsrat, seed=seed)
+
+sensor_budget   = int(len(wds.junctions) * args.obsrat)
+print('Deploying {} sensors...\n'.format(sensor_budget))
+
+sensor_shop = SensorInstaller(wds)
+
+if args.deploy == 'random':
+    sensor_shop.deploy_by_random(
+            sensor_budget   = sensor_budget,
+            seed            = seed
+            )
+elif args.deploy == 'dist':
+    sensor_shop.deploy_by_shortest_path(
+            sensor_budget   = sensor_budget,
+            weight_by       = 'length'
+            )
+elif args.deploy == 'hydrodist':
+    sensor_shop.deploy_by_shortest_path(
+            sensor_budget   = sensor_budget,
+            weight_by       = 'iweight'
+            )
+elif args.deploy == 'hds':
+    print('Calculating nodal sensitivity to demand change...\n')
+    ptb = np.max(wds.junctions.basedemand) / 100
+    S   = get_sensitivity_matrix(wds, ptb)
+    sensor_shop.deploy_by_shortest_path_with_sensitivity(
+            sensor_budget       = sensor_budget,
+            sensitivity_matrix  = S,
+            weight_by           = 'iweight'
+            )
+else:
+    print('Sensor deployment technique is unknown.\n')
+    raise
+
+reader  = DataReader(
+            pathToDB,
+            n_junc  = len(wds.junctions),
+            signal_mask = sensor_shop.signal_mask()
+            )
 trn_x, _, _ = reader.read_data(
     dataset = 'trn',
     varname = 'junc_heads',
