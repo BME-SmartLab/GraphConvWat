@@ -38,10 +38,10 @@ def get_nx_graph(wds, mode='binary'):
             d['iweight'] /= max_iweight
         for pump in wds.pumps:
             if (pump.from_node.index in junc_list) and (pump.to_node.index in junc_list):
-                G.add_edge(pump.from_node.index, pump.to_node.index, weight=1., length=0.)
+                G.add_edge(pump.from_node.index, pump.to_node.index, weight=1., iweight=1., length=0.)
         for valve in wds.valves:
             if (valve.from_node.index in junc_list) and (valve.to_node.index in junc_list):
-                G.add_edge(valve.from_node.index, valve.to_node.index, weight=1., length=0.)
+                G.add_edge(valve.from_node.index, valve.to_node.index, weight=1., iweight=1., length=0.)
     elif mode == 'logarithmic':
         max_weight = 0
         for pipe in wds.pipes:
