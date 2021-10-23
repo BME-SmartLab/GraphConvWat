@@ -210,7 +210,8 @@ else:
 reader  = DataReader(
             pathToDB,
             n_junc  = len(wds.junctions),
-            signal_mask = sensor_shop.signal_mask()
+            signal_mask = sensor_shop.signal_mask(),
+            node_order  = np.array(list(G.nodes))-1
             )
 trn_x, _, _ = reader.read_data(
     dataset = 'trn',

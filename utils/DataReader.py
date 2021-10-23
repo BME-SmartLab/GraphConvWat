@@ -4,9 +4,10 @@ import numpy as np
 import zarr
 
 class DataReader():
-    def __init__(self, path_to_db=None, n_junc=None, obsrat=.8, seed=None, signal_mask=None):
+    def __init__(self, path_to_db=None, n_junc=None, obsrat=.8, seed=None, signal_mask=None, node_order=None):
         self.path_to_db = path_to_db
         self.obsrat     = obsrat
+        self.node_order = node_order
         if seed:
             np.random.seed(seed)
         if signal_mask is None:
@@ -49,4 +50,7 @@ class DataReader():
             arr = np.concatenate((arr, obs_mx), axis=2)
         else:
             arr = np.expand_dims(arr.compute(), axis=2)
+
+        if self.node_order is not None:
+            arr = arr[:, self.node_order, :]
         return arr, bias, scale
