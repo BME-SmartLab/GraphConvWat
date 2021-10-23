@@ -44,6 +44,19 @@ class SensorInstaller():
 
     def deploy_by_random(self, sensor_budget, seed=None):
         num_nodes   = len(self.G.nodes)
+        signal_mask = np.zeros(shape=(num_nodes,), dtype=np.int8)
+        if seed:
+            np.random.seed(seed)
+        observed_nodes  = np.random.choice(
+            np.arange(num_nodes),
+            size    = sensor_budget,
+            replace = False
+            )
+        signal_mask[observed_nodes] = 1
+        self.sensor_nodes   = set(self.wds.junctions.index[np.where(signal_mask)[0]])
+
+    def deploy_by_random_deprecated(self, sensor_budget, seed=None):
+        num_nodes   = len(self.G.nodes)
         signal_mask = np.ones(shape=(num_nodes,), dtype=np.int8)
         if seed:
             np.random.seed(seed)
