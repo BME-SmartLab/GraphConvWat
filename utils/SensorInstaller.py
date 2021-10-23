@@ -39,6 +39,9 @@ class SensorInstaller():
             raise
         return master_nodes
 
+    def deploy_by_idx(self, idx):
+        self.sensor_nodes   = set([idx])
+
     def deploy_by_random(self, sensor_budget, seed=None):
         num_nodes   = len(self.G.nodes)
         signal_mask = np.ones(shape=(num_nodes,), dtype=np.int8)

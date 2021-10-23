@@ -49,6 +49,10 @@ parser.add_argument('--epoch',
                     default = '1',
                     type    = int,
                     help    = "Number of epochs.")
+parser.add_argument('--idx',
+                    default = None,
+                    type    = int,
+                    help    = "Dev function.")
 parser.add_argument('--batch',
                     default = '40',
                     type    = int,
@@ -206,6 +210,9 @@ elif args.deploy == 'hds':
 else:
     print('Sensor deployment technique is unknown.\n')
     raise
+
+if args.idx:
+    sensor_shop.deploy_by_idx(idx=args.idx)
 
 reader  = DataReader(
             pathToDB,
