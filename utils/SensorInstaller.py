@@ -26,17 +26,17 @@ class SensorInstaller():
                     node_a, node_b, tank))
                 raise
 
-        for reservoir in wds.reservoirs:
-            node_a  = wds.links[list(reservoir.links.keys())[0]].from_node.index
-            node_b  = wds.links[list(reservoir.links.keys())[0]].to_node.index
-        if node_a in set(G.nodes):
-            master_nodes.add(node_a)
-        elif node_b in set(G.nodes):
-            master_nodes.add(node_b)
-        else:
-            print('Neither node {} nor {} of reservoir {} not found in graph.'.format(
-                node_a, node_b, reservoir))
-            raise
+#        for reservoir in wds.reservoirs:
+#            node_a  = wds.links[list(reservoir.links.keys())[0]].from_node.index
+#            node_b  = wds.links[list(reservoir.links.keys())[0]].to_node.index
+#        if node_a in set(G.nodes):
+#            master_nodes.add(node_a)
+#        elif node_b in set(G.nodes):
+#            master_nodes.add(node_b)
+#        else:
+#            print('Neither node {} nor {} of reservoir {} not found in graph.'.format(
+#                node_a, node_b, reservoir))
+#            raise
         return master_nodes
 
     def deploy_by_idx(self, idx):
