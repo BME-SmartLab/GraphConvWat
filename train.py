@@ -174,7 +174,8 @@ wds = Network(pathToWDS)
 G   = get_nx_graph(wds, mode=args.adj)
 
 if args.deterministic:
-    seed    = run_id
+    seeds   = [8, 5266, 84, 411325, 88867, 235]
+    seed    = seeds[len(seeds) % run_id]
 else:
     seed    = None
 
