@@ -160,10 +160,11 @@ if not valves.empty:
     lc = mc.LineCollection(valve_collection, linewidths=mew, color='k')
     ax.add_collection(lc)
 
-cmap    = plt.get_cmap('plasma')
 colors  = []
 for idx, junc in juncs.iterrows():
     if sensor_shop.signal_mask()[idx]:
+        color = (.0,.0,1.,1.)
+    elif sensor_shop.master_node_mask()[idx]:
         color = (1.,0.,0.,1.)
     else:
         color = (1.,1.,1.,1.)

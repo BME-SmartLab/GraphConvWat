@@ -116,6 +116,15 @@ class SensorInstaller():
                     )
         self.sensor_nodes   = sensor_nodes
 
+    def master_node_mask(self):
+        mask = np.zeros(shape=(len(self.wds.junctions),), dtype=np.float32)
+        if self.master_nodes:
+            for index in list(self.master_nodes):
+                mask[np.where(self.wds.junctions.index.values == index)[0][0]]  = 1.
+        else:
+            print('There are no master nodes in the system.')
+        return mask
+
     def signal_mask(self):
         signal_mask = np.zeros(shape=(len(self.wds.junctions),), dtype=np.float32)
         if self.sensor_nodes:
