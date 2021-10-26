@@ -90,6 +90,7 @@ run_stamp   = run_stamp + str(run_id)
 pathToLog   = os.path.join(pathToLogs, run_stamp+'.csv')
 pathToModel = os.path.join(pathToExps, 'models', run_stamp+'.pt')
 pathToMeta  = os.path.join(pathToExps, 'models', run_stamp+'_meta.csv')
+pathToSens  = os.path.join(pathToExps, 'models', run_stamp+'_sensor_nodes.csv')
 pathToWDS   = os.path.join('water_networks', wds_name+'.inp')
 
 # ----- ----- ----- ----- ----- -----
@@ -201,7 +202,9 @@ else:
     raise
 
 if args.idx:
-    sensor_shop.deploy_by_idx(idx=args.idx)
+    sensor_shop.set_sensor_nodes([args.idx])
+
+np.savetxt(pathToSens, np.array(list(sensor_shop.sensor_nodes)), fmt='%d')
 
 reader  = DataReader(
             pathToDB,

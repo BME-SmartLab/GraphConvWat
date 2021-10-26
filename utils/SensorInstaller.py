@@ -39,8 +39,8 @@ class SensorInstaller():
             raise
         return master_nodes
 
-    def deploy_by_idx(self, idx):
-        self.sensor_nodes   = set([idx])
+    def set_sensor_nodes(self, sensor_nodes):
+        self.sensor_nodes   = set(sensor_nodes)
 
     def deploy_by_random(self, sensor_budget, seed=None):
         num_nodes   = len(self.G.nodes)

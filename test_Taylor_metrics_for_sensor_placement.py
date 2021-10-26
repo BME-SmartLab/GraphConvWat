@@ -38,7 +38,7 @@ parser.add_argument('--deploy',
                     type    = str,
                     help    = "Method of sensor deployment.")
 parser.add_argument('--obsrat',
-                    default = .05,
+                    default = .1,
                     type    = float,
                     help    = "Observation ratio."
                     )
@@ -93,6 +93,7 @@ run_stamp   = run_stamp + str(run_id)
 pathToDB    = os.path.join(pathToRoot, 'data', 'db_' + wds_name +'_'+ args.db)
 pathToModel = os.path.join(pathToExps, 'models', run_stamp+'.pt')
 pathToMeta  = os.path.join(pathToExps, 'models', run_stamp+'_meta.csv')
+pathToSens  = os.path.join(pathToExps, 'models', run_stamp+'_sensor_nodes.csv')
 pathToWDS   = os.path.join('water_networks', wds_name+'.inp')
 pathToResults   =  os.path.join(pathToRoot, 'experiments', args.metricsdb + '.csv')
 
@@ -162,34 +163,8 @@ sensor_budget   = int(len(wds.junctions) * args.obsrat)
 print('Deploying {} sensors...\n'.format(sensor_budget))
 
 sensor_shop = SensorInstaller(wds)
-
-if args.deploy == 'random':
-    sensor_shop.deploy_by_random(
-            sensor_budget   = sensor_budget,
-            seed            = seed
-            )
-elif args.deploy == 'dist':
-    sensor_shop.deploy_by_shortest_path(
-            sensor_budget   = sensor_budget,
-            weight_by       = 'length'
-            )
-elif args.deploy == 'hydrodist':
-    sensor_shop.deploy_by_shortest_path(
-            sensor_budget   = sensor_budget,
-            weight_by       = 'iweight'
-            )
-elif args.deploy == 'hds':
-    print('Calculating nodal sensitivity to demand change...\n')
-    ptb = np.max(wds.junctions.basedemand) / 100
-    S   = get_sensitivity_matrix(wds, ptb)
-    sensor_shop.deploy_by_shortest_path_with_sensitivity(
-            sensor_budget       = sensor_budget,
-            sensitivity_matrix  = S,
-            weight_by           = 'iweight'
-            )
-else:
-    print('Sensor deployment technique is unknown.\n')
-    raise
+sensor_nodes= np.loadtxt(pathToSens, dtype=np.int32)
+sensor_shop.set_sensor_nodes(sensor_nodes)
 
 reader  = DataReader(
             pathToDB,
