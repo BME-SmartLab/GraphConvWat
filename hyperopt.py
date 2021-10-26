@@ -16,6 +16,7 @@ from utils.graph_utils import get_nx_graph
 from utils.DataReader import DataReader
 from utils.Metrics import Metrics
 from utils.EarlyStopping import EarlyStopping
+from utils.dataloader import build_dataloader
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.set_default_dtype(torch.float64)
@@ -63,16 +64,6 @@ def objective(trial):
     # ----- ----- ----- ----- ----- -----
     # Functions
     # ----- ----- ----- ----- ----- -----
-    def build_dataloader(G, set_x, set_y, batch_size, shuffle):
-        data    = []
-        for x, y in zip(set_x, set_y):
-            graph   = from_networkx(G)
-            graph.x = torch.Tensor(x)
-            graph.y = torch.Tensor(y)
-            data.append(graph)
-        loader  = DataLoader(data, batch_size=batch_size, shuffle=shuffle)
-        return loader
-    
     def train_one_epoch():
         model.train()
         total_loss  = 0

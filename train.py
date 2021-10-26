@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import argparse
-import copy
 import os
 import glob
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
-from torch_geometric.loader import DataLoader
 from torch_geometric.utils import from_networkx
 from torch_geometric.nn import ChebConv
 from epynet import Network
@@ -17,6 +15,7 @@ from utils.DataReader import DataReader
 from utils.SensorInstaller import SensorInstaller
 from utils.Metrics import Metrics
 from utils.EarlyStopping import EarlyStopping
+from utils.dataloader import build_dataloader
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # ----- ----- ----- ----- ----- -----
@@ -111,17 +110,6 @@ hyperparams.to_csv(pathToMeta, header=False)
 # ----- ----- ----- ----- ----- -----
 # Functions
 # ----- ----- ----- ----- ----- -----
-def build_dataloader(G, set_x, set_y, batch_size, shuffle):
-    data    = []
-    master_graph    = from_networkx(G)
-    for x, y in zip(set_x, set_y):
-        graph   = copy.deepcopy(master_graph)
-        graph.x = torch.Tensor(x)
-        graph.y = torch.Tensor(y)
-        data.append(graph)
-    loader  = DataLoader(data, batch_size=batch_size, shuffle=shuffle)
-    return loader
-
 def train_one_epoch():
     model.train()
     total_loss  = 0

@@ -19,6 +19,7 @@ from utils.SensorInstaller import SensorInstaller
 from utils.Metrics import Metrics
 from utils.MeanPredictor import MeanPredictor
 from utils.baselines import interpolated_regularization
+from utils.dataloader import build_dataloader
 
 #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device = torch.device('cpu')
@@ -99,17 +100,6 @@ pathToResults   =  os.path.join(pathToRoot, 'experiments', args.metricsdb + '.cs
 # ----- ----- ----- ----- ----- -----
 # Functions
 # ----- ----- ----- ----- ----- -----
-def build_dataloader(G, set_x, set_y, batch_size, shuffle):
-    data    = []
-    master_graph    = from_networkx(G)
-    for x, y in zip(set_x, set_y):
-        graph   = copy.deepcopy(master_graph)
-        graph.x = torch.Tensor(x)
-        graph.y = torch.Tensor(y)
-        data.append(graph)
-    loader  = DataLoader(data, batch_size=batch_size, shuffle=shuffle)
-    return loader
-
 def restore_real_nodal_p(dta_ldr, num_nodes, num_graphs):
     nodal_pressures = np.empty((num_graphs, num_nodes))
     end_idx = 0
