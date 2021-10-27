@@ -53,12 +53,6 @@ parser.add_argument('--adj',
                     type    = str,
                     help    = "Type of adjacency matrix."
                     )
-parser.add_argument('--model',
-                    default = 'orig',
-                    choices = ['orig', 'naive', 'gcn', 'interp'],
-                    type    = str,
-                    help    = "Model to use."
-                    )
 parser.add_argument('--metricsdb',
                     default = 'Taylor_metrics',
                     type    = str,
@@ -123,18 +117,6 @@ def predict_nodal_p_gcn(dta_ldr, num_nodes, num_graphs):
         end_idx += batch.num_graphs
     return da.array(nodal_pressures)
 
-def predict_nodal_p_naive(dta_ldr, num_nodes, num_graphs):
-    model   = MeanPredictor(device)
-    nodal_pressures = np.empty((num_graphs, num_nodes))
-    end_idx = 0
-    for i, batch in enumerate(tst_ldr):
-        batch.to(device)
-        p   = model.pred(batch.y, batch.x[:, -1].type(torch.bool))
-        p   = metrics_nrm._rescale(p).reshape(-1, num_nodes).detach().cpu().numpy()
-        nodal_pressures[end_idx:end_idx+batch.num_graphs, :]    = p
-        end_idx += batch.num_graphs
-    return da.array(nodal_pressures)
-
 def load_model():
     if args.wds == 'anytown':
         from model.anytown import ChebNet as Net
@@ -157,10 +139,7 @@ def compute_metrics(p, p_hat):
 # ----- ----- ----- ----- ----- -----
 wds = Network(pathToWDS)
 G   = get_nx_graph(wds, mode=args.adj)
-L   = nx.linalg.laplacianmatrix.laplacian_matrix(G).todense()
-seed    = run_id
-sensor_budget   = int(len(wds.junctions) * args.obsrat)
-print('Deploying {} sensors...\n'.format(sensor_budget))
+print('Deploying sensors...\n')
 
 sensor_shop = SensorInstaller(wds)
 sensor_nodes= np.loadtxt(pathToSens, dtype=np.int32)
@@ -169,7 +148,8 @@ sensor_shop.set_sensor_nodes(sensor_nodes)
 reader  = DataReader(
             pathToDB,
             n_junc  = len(wds.junctions),
-            signal_mask = sensor_shop.signal_mask()
+            signal_mask = sensor_shop.signal_mask(),
+            node_order  = np.array(list(G.nodes))-1
             )
 tst_x, bias_std, scale_std  = reader.read_data(
     dataset = 'tst',
@@ -191,22 +171,13 @@ num_graphs  = len(tst_x)
 # ----- ----- ----- ----- ----- -----
 # Compute metrics
 # ----- ----- ----- ----- ----- -----
-run_stamp   = run_stamp+'-'+args.model
+run_stamp   = run_stamp+'-'+'gcn'
 print(run_stamp)
 p   = restore_real_nodal_p(tst_ldr, num_nodes, num_graphs)
 
-if args.model == 'orig':
-    p_hat   = p
-elif args.model == 'naive':
-    p_hat   = predict_nodal_p_naive(tst_ldr, num_nodes, num_graphs)
-elif args.model == 'gcn':
-    Net = load_model()
-    model   = Net(np.shape(tst_x)[-1], np.shape(tst_y)[-1]).to(device)
-    p_hat   = predict_nodal_p_gcn(tst_ldr, num_nodes, num_graphs)
-elif args.model == 'interp':
-    p_hat   = interpolated_regularization(L, tst_x)
-    p_hat   = p_hat*scale_std+bias_std
-    p_hat   = da.array(p_hat)
+Net     = load_model()
+model   = Net(np.shape(tst_x)[-1], np.shape(tst_y)[-1]).to(device)
+p_hat   = predict_nodal_p_gcn(tst_ldr, num_nodes, num_graphs)
 
 msec, sigma = compute_metrics(p, p_hat)
 
