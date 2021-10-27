@@ -29,6 +29,12 @@ parser.add_argument(
     type    = float
     )
 parser.add_argument(
+    '--sensorfile',
+    default = None,
+    type    = str,
+    help    = "Filename for defining sensor nodes directly."
+    )
+parser.add_argument(
     '--deploy',
     default = 'random',
     choices = ['random', 'dist', 'hydrodist', 'hds'],
@@ -51,6 +57,9 @@ parser.add_argument(
     action  = 'store_true'
     )
 args    = parser.parse_args()
+
+pathToRoot      = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+pathToModels    = os.path.join(pathToRoot, 'experiments', 'models')
 
 wds = Network(os.path.join('..', 'water_networks', args.wds+'.inp'))
 wds.solve()
@@ -87,6 +96,13 @@ elif args.deploy == 'hds':
 else:
     print('Sensor deployment technique is unknown.\n')
     raise
+
+if args.sensorfile:
+    sensor_nodes    = np.loadtxt(
+        os.path.join(pathToModels, args.sensorfile+'.csv'),
+        dtype   = np.int32
+        )
+    sensor_shop.set_sensor_nodes(sensor_nodes)
 
 def get_node_df(elements, get_head=False):
     data = []
