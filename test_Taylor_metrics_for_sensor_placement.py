@@ -21,7 +21,7 @@ from utils.MeanPredictor import MeanPredictor
 from utils.baselines import interpolated_regularization
 from utils.dataloader import build_dataloader
 
-device = torch.device('cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # ----- ----- ----- ----- ----- -----
 # Command line arguments
@@ -139,7 +139,6 @@ def compute_metrics(p, p_hat):
 # ----- ----- ----- ----- ----- -----
 wds = Network(pathToWDS)
 G   = get_nx_graph(wds, mode=args.adj)
-print('Deploying sensors...\n')
 
 sensor_shop = SensorInstaller(wds)
 sensor_nodes= np.loadtxt(pathToSens, dtype=np.int32)
