@@ -57,18 +57,24 @@ dia = TaylorDiagram(
         )
 dia.samplePoints[0].set_color('r')
 dia.samplePoints[0].set_marker('P')
-cmap    = plt.get_cmap('tab10')
+cmap    = plt.get_cmap('Dark2')
+markers = ['o', 'x', '*', 's']
 
-for idx, row in df.iterrows():
-    sigma   = row['sigma_pred'] / row['sigma_true']
-    rho     = row['corr_coeff']
-    dia.add_sample(sigma, rho,
-        marker  = 'o',
-        ms  = 7,
-        ls  = '',
-        mfc = cmap(idx),
-        mec = 'none',
-        )
+def add_samples(dia, key, color, marker):
+    for idx_dst, row in df.loc[df['placement'] == key].iterrows():
+        sigma   = row['sigma_pred'] / row['sigma_true']
+        rho     = row['corr_coeff']
+        dia.add_sample(sigma, rho,
+            marker  = marker,
+            ms  = 7,
+            ls  = '',
+            mec = color,
+            mew = 2,
+            mfc = 'none',
+            )
+
+add_samples(dia, 'dist', cmap(1), markers[0])
+add_samples(dia, 'hydrodist', cmap(2), markers[1])
 
 contours    = dia.add_contours(
                 levels      = 6,
