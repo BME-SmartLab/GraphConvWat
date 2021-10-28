@@ -164,7 +164,7 @@ G   = get_nx_graph(wds, mode=args.adj)
 
 if args.deterministic:
     seeds   = [1, 8, 5266, 739, 88867]
-    seed    = seeds[len(seeds) % run_id]
+    seed    = seeds[run_id % len(seeds)]
 else:
     seed    = None
 
