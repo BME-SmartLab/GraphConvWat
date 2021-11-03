@@ -93,9 +93,9 @@ class SensorInstaller():
             self, sensor_budget, sensitivity_matrix, weight_by=None):
         sensor_nodes        = set()
         nodal_sensitivity   = dict()
+        nodal_sensitivities = np.sum(np.abs(sensitivity_matrix), axis=0)
         for i, junc in enumerate(self.wds.junctions):
-            nodal_sensitivity[junc.index]   = np.sum(
-                    np.abs(sensitivity_matrix), axis=0)[i]
+            nodal_sensitivity[junc.index]   = nodal_sensitivities[i]
 
         for _ in range(sensor_budget):
             path_lengths    = dict()
