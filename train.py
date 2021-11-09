@@ -44,8 +44,12 @@ parser.add_argument('--deploy',
                     choices = ['random', 'dist', 'hydrodist', 'hds', 'hdsrnd'],
                     type    = str,
                     help    = "Method of sensor deployment.")
+parser.add_argument('--aversion',
+                    default = 0,
+                    type    = int,
+                    help    = "Nodal aversion for HDS sensor placement.")
 parser.add_argument('--epoch',
-                    default = '1',
+                    default = 1,
                     type    = int,
                     help    = "Number of epochs.")
 parser.add_argument('--idx',
@@ -195,7 +199,8 @@ elif args.deploy == 'hds':
     sensor_shop.deploy_by_shortest_path_with_sensitivity(
             sensor_budget       = sensor_budget,
             sensitivity_matrix  = S,
-            weight_by           = 'iweight'
+            weight_by           = 'iweight',
+            aversion            = args.aversion
             )
 elif args.deploy == 'hdsrnd':
     print('Calculating nodal sensitivity to demand change...\n')
