@@ -121,8 +121,10 @@ class SensorInstaller():
         self.sensor_nodes   = sensor_nodes
 
     def deploy_by_shortest_path_with_sensitivity(
-            self, sensor_budget, sensitivity_matrix, weight_by=None):
+            self, sensor_budget, sensitivity_matrix, weight_by=None, aversion=0):
+        assert aversion >= 0
         sensor_nodes        = set()
+        forbidden_nodes     = set()
         nodal_sensitivity   = dict()
         nodal_sensitivities = np.sum(np.abs(sensitivity_matrix), axis=0)
         for i, junc in enumerate(self.wds.junctions):
@@ -139,12 +141,17 @@ class SensorInstaller():
                     weight  = weight_by
                     )
                 for key, value in tempo.items():
-                    if key not in self.master_nodes.union(sensor_nodes):
+                    if key not in self.master_nodes.union(forbidden_nodes):
                         path_lengths[key]   += nodal_sensitivity[key]*value
-            sensor_nodes.add(
-                    [candidate for candidate, path_length in path_lengths.items()
-                        if path_length == np.max(list(path_lengths.values()))][0]
-                    )
+            sensor_node = [candidate for candidate, path_length in path_lengths.items() 
+                    if path_length == np.max(list(path_lengths.values()))][0]
+            sensor_nodes.add(sensor_node)
+            
+            forbidden_nodes = forbidden_nodes.union(set(
+                nx.algorithms.shortest_paths.single_source_shortest_path(
+                    self.G, sensor_node, cutoff=aversion
+                    ).keys()
+                ))
         self.sensor_nodes   = sensor_nodes
 
     def master_node_mask(self):
