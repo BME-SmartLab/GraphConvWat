@@ -10,7 +10,7 @@ dependencies:
   - torchvision
   - torchaudio
   - pyg
-  - cudatoolkit=11.1
+  - cudatoolkit=11.3
   - dask
   - jupyter
   - matplotlib
