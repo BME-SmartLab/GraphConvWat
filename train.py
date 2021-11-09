@@ -41,7 +41,7 @@ parser.add_argument('--adj',
                     help    = "Type of adjacency matrix.")
 parser.add_argument('--deploy',
                     default = 'random',
-                    choices = ['random', 'dist', 'hydrodist', 'hds'],
+                    choices = ['random', 'dist', 'hydrodist', 'hds', 'hdsrnd'],
                     type    = str,
                     help    = "Method of sensor deployment.")
 parser.add_argument('--epoch',
@@ -196,6 +196,16 @@ elif args.deploy == 'hds':
             sensor_budget       = sensor_budget,
             sensitivity_matrix  = S,
             weight_by           = 'iweight'
+            )
+elif args.deploy == 'hdsrnd':
+    print('Calculating nodal sensitivity to demand change...\n')
+    ptb = np.max(wds.junctions.basedemand) / 100
+    S   = get_sensitivity_matrix(wds, ptb)
+    sensor_shop.deploy_by_shortest_path_with_sensitivity_rnd(
+            sensor_budget       = sensor_budget,
+            sensitivity_matrix  = S,
+            weight_by           = 'iweight',
+            seed                = seed
             )
 else:
     print('Sensor deployment technique is unknown.\n')

@@ -55,6 +55,37 @@ class SensorInstaller():
         signal_mask[observed_nodes] = 1
         self.sensor_nodes   = set(self.wds.junctions.index[np.where(signal_mask)[0]])
 
+    def deploy_by_shortest_path_with_sensitivity_rnd(
+            self, sensor_budget, sensitivity_matrix, weight_by=None, seed=None):
+        if seed:
+            np.random.seed(seed)
+        sensor_nodes        = set()
+        nodal_sensitivity   = dict()
+        nodal_sensitivities = np.sum(np.abs(sensitivity_matrix), axis=0)
+        nodal_sensitivities *= np.random.uniform(size=nodal_sensitivities.shape)
+        for i, junc in enumerate(self.wds.junctions):
+            nodal_sensitivity[junc.index]   = nodal_sensitivities[i]
+
+        for _ in range(sensor_budget):
+            path_lengths    = dict()
+            for node in self.G.nodes:
+                path_lengths[node]  = 0
+            for node in self.master_nodes.union(sensor_nodes):
+                tempo   = nx.shortest_path_length(
+                    self.G,
+                    source  = node,
+                    weight  = weight_by
+                    )
+                for key, value in tempo.items():
+                    if key not in self.master_nodes.union(sensor_nodes):
+                        path_lengths[key]   += nodal_sensitivity[key]*value
+            sensor_nodes.add(
+                    [candidate for candidate, path_length in path_lengths.items()
+                        if path_length == np.max(list(path_lengths.values()))][0]
+                    )
+        self.sensor_nodes   = sensor_nodes
+
+
     def deploy_by_random_deprecated(self, sensor_budget, seed=None):
         num_nodes   = len(self.G.nodes)
         signal_mask = np.ones(shape=(num_nodes,), dtype=np.int8)
