@@ -70,9 +70,9 @@ class SensorInstaller():
 
     def deploy_by_shortest_path(self, sensor_budget, weight_by=None):
         sensor_nodes    = set()
+        forbidden_nodes = self.master_nodes
         for _ in range(sensor_budget):
             path_lengths    = dict()
-            forbidden_nodes = self.master_nodes.union(sensor_nodes)
             for node in forbidden_nodes:
                 path_lengths[node]  = 0
             for node in set(self.G.nodes).difference(forbidden_nodes):
@@ -91,13 +91,14 @@ class SensorInstaller():
             sensor_node = [candidate for candidate, path_length in path_lengths.items()
                         if path_length == np.max(list(path_lengths.values()))][0]
             sensor_nodes.add(sensor_node)
+            forbidden_nodes.add(sensor_node)
         self.sensor_nodes   = sensor_nodes
 
     def deploy_by_shortest_path_with_sensitivity(
             self, sensor_budget, sensitivity_matrix, weight_by=None, aversion=0):
         assert aversion >= 0
         sensor_nodes        = set()
-        forbidden_nodes     = set()
+        forbidden_nodes     = self.master_nodes
         nodal_sensitivity   = dict()
         nodal_sensitivities = np.sum(np.abs(sensitivity_matrix), axis=0)
         for i, junc in enumerate(self.wds.junctions):
@@ -105,8 +106,11 @@ class SensorInstaller():
 
         for _ in range(sensor_budget):
             path_lengths    = dict()
-            for node in self.G.nodes:
+            for node in forbidden_nodes:
                 path_lengths[node]  = 0
+            for node in set(self.G.nodes).difference(forbidden_nodes):
+                path_lengths[node]  = np.inf
+
             for node in self.master_nodes.union(sensor_nodes):
                 tempo   = nx.shortest_path_length(
                     self.G,
@@ -114,8 +118,8 @@ class SensorInstaller():
                     weight  = weight_by
                     )
                 for key, value in tempo.items():
-                    if key not in self.master_nodes.union(forbidden_nodes):
-                        path_lengths[key]   += nodal_sensitivity[key]*value
+                    if (key not in forbidden_nodes) and (path_lengths[key] > nodal_sensitivity[key]*value):
+                        path_lengths[key]   = nodal_sensitivity[key]*value
             sensor_node = [candidate for candidate, path_length in path_lengths.items() 
                     if path_length == np.max(list(path_lengths.values()))][0]
             sensor_nodes.add(sensor_node)
