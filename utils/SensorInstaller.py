@@ -39,6 +39,13 @@ class SensorInstaller():
             raise
         return master_nodes
 
+    def get_shortest_path_lengths(self, nodes):
+        lengths = np.zeros(shape=(len(nodes), len(nodes)))
+        for i, source in enumerate(nodes):
+            for j, target in enumerate(nodes):
+                lengths[i, j]   = nx.shortest_path_length(self.G, source=source, target=target)
+        return lengths
+
     def set_sensor_nodes(self, sensor_nodes):
         self.sensor_nodes   = set(sensor_nodes)
 
