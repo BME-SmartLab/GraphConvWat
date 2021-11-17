@@ -22,6 +22,11 @@ parser.add_argument(
     type    = str
     )
 parser.add_argument(
+    '--obsrat',
+    default = 0.05,
+    type    = float
+    )
+parser.add_argument(
     '--smin',
     default = 0,
     type    = float
@@ -37,7 +42,7 @@ args    = parser.parse_args()
 # DB loading
 # ----- ----- ----- ----- ----- -----
 df  = pd.read_csv(os.path.join('..', 'experiments', 'Taylor_metrics_processed.csv'), index_col=0)
-df  = df.loc[(df['tag'] == 'placement') & (df['wds'] == args.wds)]
+df  = df.loc[(df['tag'] == 'placement') & (df['wds'] == args.wds) & (df['obs_rat'] == args.obsrat)]
 
 # ----- ----- ----- ----- ----- -----
 # Plot assembly
@@ -52,7 +57,7 @@ dia = TaylorDiagram(
 dia.samplePoints[0].set_color('r')
 dia.samplePoints[0].set_marker('P')
 cmap    = plt.get_cmap('Dark2')
-markers = ['s', 'x', '*', '.']
+markers = ['s', 'x', '*', '.', '+']
 
 def add_samples(dia, df, color, marker):
     for idx_dst, row in df.iterrows():
@@ -60,7 +65,7 @@ def add_samples(dia, df, color, marker):
         rho     = row['corr_coeff']
         dia.add_sample(sigma, rho,
             marker  = marker,
-            ms  = 9,
+            ms  = 12,
             ls  = '',
             mec = color,
             mew = 2,
@@ -74,6 +79,7 @@ for i, seed in enumerate(seeds):
 add_samples(dia, df.loc[df['placement'] == 'dist'], cmap(1), markers[0])
 add_samples(dia, df.loc[df['placement'] == 'hydrodist'], cmap(2), markers[1])
 add_samples(dia, df.loc[df['placement'] == 'hds'], cmap(3), markers[2])
+add_samples(dia, df.loc[df['placement'] == 'hdsa'], cmap(3), markers[4])
 
 contours    = dia.add_contours(
                 levels      = 6,

@@ -34,7 +34,7 @@ parser.add_argument('--wds',
                     )
 parser.add_argument('--deploy',
                     default = 'random',
-                    choices = ['random', 'dist', 'hydrodist', 'hds'],
+                    choices = ['random', 'dist', 'hydrodist', 'hds', 'hdsa'],
                     type    = str,
                     help    = "Method of sensor deployment.")
 parser.add_argument('--obsrat',

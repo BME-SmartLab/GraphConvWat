@@ -87,7 +87,10 @@ pathToExps  = os.path.join(pathToRoot, 'experiments')
 pathToLogs  = os.path.join(pathToExps, 'logs')
 run_id  = 1
 logs    = [f for f in glob.glob(os.path.join(pathToLogs, '*.csv'))]
-run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
+if args.aversion == 0:
+    run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
+else:
+    run_stamp   = wds_name+'-'+'hdsa'+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
 while os.path.join(pathToLogs, run_stamp + str(run_id)+'.csv') in logs:
     run_id  += 1
 run_stamp   = run_stamp + str(run_id)
