@@ -5,14 +5,28 @@ import numpy as np
 from utils.graph_utils import get_nx_graph
 
 class SensorInstaller():
-    def __init__(self, wds):
+    def __init__(self, wds, include_pumps_as_master=False):
         self.wds    = wds
         self.G      = get_nx_graph(wds, mode='weighted')
+        self.include_pumps  = include_pumps_as_master
         self.master_nodes   = self._collect_master_nodes(self.wds, self.G)
         self.sensor_nodes   = set()
 
     def _collect_master_nodes(self, wds, G):
         master_nodes    = set()
+
+        if self.include_pumps:
+            for pump in wds.pumps:
+                node_a  = pump.from_node.index
+                node_b  = pump.to_node.index
+                if node_a in set(G.nodes):
+                    master_nodes.add(node_a)
+                elif node_b in set(G.nodes):
+                    master_nodes.add(node_b)
+                else:
+                    print('Neither node {} nor {} of pump {} not found in graph.'.format(
+                        node_a, node_b, pump))
+                    raise
 
         for tank in wds.tanks:
             node_a  = wds.links[list(tank.links.keys())[0]].from_node.index
