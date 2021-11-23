@@ -56,7 +56,7 @@ dia = TaylorDiagram(
         )
 dia.samplePoints[0].set_color('r')
 dia.samplePoints[0].set_marker('P')
-cmap    = plt.get_cmap('Dark2')
+cmap    = plt.get_cmap('Paired')
 markers = ['s', 'x', '*', '.', '+']
 
 def add_samples(dia, df, color, marker):
@@ -73,13 +73,14 @@ def add_samples(dia, df, color, marker):
             )
 
 seeds   = [1, 8, 5266, 739, 88867]
+#seeds   = [88867]
 for i, seed in enumerate(seeds):
     mask    = (df['placement'] == 'random') & (df['seed'] == seed)
-    add_samples(dia, df.loc[mask], cmap(i+4), markers[3])
+    add_samples(dia, df.loc[mask], cmap(i+5), markers[3])
 add_samples(dia, df.loc[df['placement'] == 'dist'], cmap(1), markers[0])
 add_samples(dia, df.loc[df['placement'] == 'hydrodist'], cmap(2), markers[1])
 add_samples(dia, df.loc[df['placement'] == 'hds'], cmap(3), markers[2])
-add_samples(dia, df.loc[df['placement'] == 'hdsa'], cmap(3), markers[4])
+add_samples(dia, df.loc[df['placement'] == 'hdsa'], cmap(4), markers[4])
 
 contours    = dia.add_contours(
                 levels      = 6,
