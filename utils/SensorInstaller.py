@@ -64,9 +64,25 @@ class SensorInstaller():
         paths   = []
         for source in list(nodes)[:int(len(nodes)//2+len(nodes)%2)]:
             for target in nodes:
-                path    = nx.shortest_path(self.G, source=source, target=target)
+                path    = nx.shortest_path(self.G, source=source, target=target, weight=None)
                 paths.append(nx.path_graph(path))
         return paths
+
+    def get_shortest_path_to_node_collection(self, target, node_collection, weight=None):
+        closest_node= target
+        path_length = np.inf
+        for source in node_collection:
+            tempo   = nx.shortest_path_length(
+                self.G,
+                source  = source,
+                target  = target,
+                weight  = weight
+                )
+            if tempo < path_length:
+                closest_node= source
+                path_length = tempo
+        assert closest_node is not target
+        return set(nx.shortest_path(self.G, source=closest_node, target=target))
 
     def set_sensor_nodes(self, sensor_nodes):
         self.sensor_nodes   = set(sensor_nodes)
@@ -123,6 +139,38 @@ class SensorInstaller():
             forbidden_nodes.add(sensor_node)
         self.sensor_nodes   = sensor_nodes
 
+    def deploy_by_shortest_path_v2(self, sensor_budget, weight_by=None):
+        """Computationally ineffective implementation."""
+        sensor_nodes    = set()
+        forbidden_nodes = self.master_nodes
+        for _ in range(sensor_budget):
+            path_lengths    = dict()
+            for node in forbidden_nodes:
+                path_lengths[node]  = 0
+            for node in set(self.G.nodes).difference(forbidden_nodes):
+                path_lengths[node]  = np.inf
+
+            for node in forbidden_nodes:
+                tempo   = nx.shortest_path_length(
+                    self.G,
+                    source  = node,
+                    weight  = weight_by
+                    )
+                for key, value in tempo.items():
+                    if (key not in forbidden_nodes) and (path_lengths[key] > value):
+                        path_lengths[key]   = value
+
+            sensor_node = [candidate for candidate, path_length in path_lengths.items()
+                        if path_length == np.max(list(path_lengths.values()))][0]
+            branch  = self.get_shortest_path_to_node_collection(
+                sensor_node,
+                forbidden_nodes,
+                weight  = weight_by
+                )
+            sensor_nodes.add(sensor_node)
+            forbidden_nodes = forbidden_nodes.union(branch)
+        self.sensor_nodes   = sensor_nodes
+
     def deploy_by_shortest_path_with_sensitivity(
             self, sensor_budget, sensitivity_matrix, weight_by=None, aversion=0):
         assert aversion >= 0
@@ -158,6 +206,44 @@ class SensorInstaller():
                     self.G, sensor_node, cutoff=aversion
                     ).keys()
                 ))
+        self.sensor_nodes   = sensor_nodes
+
+    def deploy_by_shortest_path_with_sensitivity_v2(
+            self, sensor_budget, sensitivity_matrix, weight_by=None, aversion=0):
+        if aversion > 0:
+            print('Aversion is not implemented in this module.')
+        sensor_nodes        = set()
+        forbidden_nodes     = self.master_nodes
+        nodal_sensitivity   = dict()
+        nodal_sensitivities = np.sum(np.abs(sensitivity_matrix), axis=0)
+        for i, junc in enumerate(self.wds.junctions):
+            nodal_sensitivity[junc.index]   = nodal_sensitivities[i]
+
+        for _ in range(sensor_budget):
+            path_lengths    = dict()
+            for node in forbidden_nodes:
+                path_lengths[node]  = 0
+            for node in set(self.G.nodes).difference(forbidden_nodes):
+                path_lengths[node]  = np.inf
+
+            for node in self.master_nodes.union(sensor_nodes):
+                tempo   = nx.shortest_path_length(
+                    self.G,
+                    source  = node,
+                    weight  = weight_by
+                    )
+                for key, value in tempo.items():
+                    if (key not in forbidden_nodes) and (path_lengths[key] > nodal_sensitivity[key]*value):
+                        path_lengths[key]   = nodal_sensitivity[key]*value
+            sensor_node = [candidate for candidate, path_length in path_lengths.items() 
+                    if path_length == np.max(list(path_lengths.values()))][0]
+            branch  = self.get_shortest_path_to_node_collection(
+                sensor_node,
+                forbidden_nodes,
+                weight  = weight_by
+                )
+            sensor_nodes.add(sensor_node)
+            forbidden_nodes = forbidden_nodes.union(branch)
         self.sensor_nodes   = sensor_nodes
 
     def master_node_mask(self):
