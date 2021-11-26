@@ -116,7 +116,7 @@ class SensorInstaller():
     def deploy_by_shortest_path(self, sensor_budget, weight_by=None, sensor_nodes=None):
         if not sensor_nodes:
             sensor_nodes    = set()
-        forbidden_nodes = self.master_nodes
+        forbidden_nodes = self.master_nodes.union(sensor_nodes)
         for _ in range(sensor_budget):
             path_lengths    = dict()
             for node in forbidden_nodes:
@@ -177,8 +177,7 @@ class SensorInstaller():
         assert aversion >= 0
         if not sensor_nodes:
             sensor_nodes    = set()
-        sensor_nodes    = set()
-        forbidden_nodes = self.master_nodes
+        forbidden_nodes = self.master_nodes.union(sensor_nodes)
         node_weights    = dict()
         for i, junc in enumerate(self.wds.junctions):
             node_weights[junc.index]   = node_weights_arr[i]
