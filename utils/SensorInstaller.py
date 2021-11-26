@@ -17,8 +17,8 @@ class SensorInstaller():
 
         if self.include_pumps:
             for pump in wds.pumps:
-                node_a  = pump.from_node.index
-                node_b  = pump.to_node.index
+                node_a  = pump.to_node.index
+                node_b  = pump.from_node.index
                 if node_a in set(G.nodes):
                     master_nodes.add(node_a)
                 elif node_b in set(G.nodes):
@@ -114,12 +114,10 @@ class SensorInstaller():
         self.sensor_nodes   = set(self.wds.junctions.index[np.where(signal_mask)[0]])
 
     def deploy_by_shortest_path(self, sensor_budget, weight_by=None, sensor_nodes=None):
-        if sensor_nodes:
-            assert sensor_budget - len(sensor_nodes) > 0
-        else:
+        if not sensor_nodes:
             sensor_nodes    = set()
         forbidden_nodes = self.master_nodes
-        for _ in range(sensor_budget - len(sensor_nodes)):
+        for _ in range(sensor_budget):
             path_lengths    = dict()
             for node in forbidden_nodes:
                 path_lengths[node]  = 0
@@ -177,9 +175,7 @@ class SensorInstaller():
     def deploy_by_shortest_path_with_sensitivity(
             self, sensor_budget, sensitivity_matrix, weight_by=None, aversion=0, sensor_nodes=None):
         assert aversion >= 0
-        if sensor_nodes:
-            assert sensor_budget - len(sensor_nodes) > 0
-        else:
+        if not sensor_nodes:
             sensor_nodes    = set()
         sensor_nodes        = set()
         forbidden_nodes     = self.master_nodes
@@ -188,7 +184,7 @@ class SensorInstaller():
         for i, junc in enumerate(self.wds.junctions):
             nodal_sensitivity[junc.index]   = nodal_sensitivities[i]
 
-        for _ in range(sensor_budget - len(sensor_nodes)):
+        for _ in range(sensor_budget):
             path_lengths    = dict()
             for node in forbidden_nodes:
                 path_lengths[node]  = 0
