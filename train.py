@@ -41,13 +41,9 @@ parser.add_argument('--adj',
                     help    = "Type of adjacency matrix.")
 parser.add_argument('--deploy',
                     default = 'random',
-                    choices = ['random', 'dist', 'hydrodist', 'hds', 'hdsrnd'],
+                    choices = ['master', 'dist', 'hydrodist', 'hds', 'hdvar', 'random'],
                     type    = str,
                     help    = "Method of sensor deployment.")
-parser.add_argument('--aversion',
-                    default = 0,
-                    type    = int,
-                    help    = "Nodal aversion for HDS sensor placement.")
 parser.add_argument('--epoch',
                     default = 1,
                     type    = int,
@@ -87,10 +83,7 @@ pathToExps  = os.path.join(pathToRoot, 'experiments')
 pathToLogs  = os.path.join(pathToExps, 'logs')
 run_id  = 1
 logs    = [f for f in glob.glob(os.path.join(pathToLogs, '*.csv'))]
-if args.aversion == 0:
-    run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
-else:
-    run_stamp   = wds_name+'-'+'hdsa'+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
+run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
 while os.path.join(pathToLogs, run_stamp + str(run_id)+'.csv') in logs:
     run_id  += 1
 run_stamp   = run_stamp + str(run_id)
@@ -178,42 +171,55 @@ else:
 sensor_budget   = int(len(wds.junctions) * args.obsrat)
 print('Deploying {} sensors...\n'.format(sensor_budget))
 
-sensor_shop = SensorInstaller(wds)
-
-if args.deploy == 'random':
-    sensor_shop.deploy_by_random(
-            sensor_budget   = sensor_budget,
-            seed            = seed
-            )
+sensor_shop = SensorInstaller(wds, include_pumps_as_master=True)
+if args.deploy == 'master':
+    sensor_shop.set_sensor_nodes(sensor_shop.master_nodes)
 elif args.deploy == 'dist':
     sensor_shop.deploy_by_shortest_path(
             sensor_budget   = sensor_budget,
-            weight_by       = 'length'
+            weight_by       = 'length',
+            sensor_nodes    = sensor_shop.master_nodes
             )
 elif args.deploy == 'hydrodist':
     sensor_shop.deploy_by_shortest_path(
             sensor_budget   = sensor_budget,
-            weight_by       = 'iweight'
+            weight_by       = 'iweight',
+            sensor_nodes    = sensor_shop.master_nodes
             )
 elif args.deploy == 'hds':
     print('Calculating nodal sensitivity to demand change...\n')
     ptb = np.max(wds.junctions.basedemand) / 100
     S   = get_sensitivity_matrix(wds, ptb)
     sensor_shop.deploy_by_shortest_path_with_sensitivity(
-            sensor_budget       = sensor_budget,
-            sensitivity_matrix  = S,
-            weight_by           = 'iweight',
-            aversion            = args.aversion
+            sensor_budget   = sensor_budget,
+            node_weights_arr= np.sum(np.abs(S), axis=0),
+            weight_by       = 'iweight',
+            sensor_nodes    = sensor_shop.master_nodes
             )
-elif args.deploy == 'hdsrnd':
-    print('Calculating nodal sensitivity to demand change...\n')
-    ptb = np.max(wds.junctions.basedemand) / 100
-    S   = get_sensitivity_matrix(wds, ptb)
-    sensor_shop.deploy_by_shortest_path_with_sensitivity_rnd(
-            sensor_budget       = sensor_budget,
-            sensitivity_matrix  = S,
-            weight_by           = 'iweight',
-            seed                = seed
+elif args.deploy == 'hdvar':
+    print('Calculating nodal head variation...\n')
+    reader  = DataReader(
+                pathToDB,
+                n_junc  = len(wds.junctions),
+                node_order  = np.array(list(G.nodes))-1
+                )
+    heads, _, _ = reader.read_data(
+        dataset = 'trn',
+        varname = 'junc_heads',
+        rescale = None,
+        cover   = False
+        )
+    sensor_shop.deploy_by_shortest_path_with_sensitivity(
+            sensor_budget   = sensor_budget,
+            node_weights_arr= heads.std(axis=0).T[0],
+            weight_by       = 'iweight',
+            sensor_nodes    = sensor_shop.master_nodes
+            )
+    del reader, heads
+elif args.deploy == 'random':
+    sensor_shop.deploy_by_random(
+            sensor_budget   = sensor_budget,
+            seed            = seed
             )
 else:
     print('Sensor deployment technique is unknown.\n')
