@@ -30,10 +30,10 @@ parser.add_argument('--db',
                     default = 'doe_pumpfed_1',
                     type    = str,
                     help    = "DB.")
-parser.add_argument('--obsrat',
-                    default = .1,
-                    type    = float,
-                    help    = "Observation ratio.")
+parser.add_argument('--budget',
+                    default = 1,
+                    type    = int,
+                    help    = "Sensor budget.")
 parser.add_argument('--adj',
                     default = 'binary',
                     choices = ['binary', 'weighted', 'logarithmic', 'pruned'],
@@ -83,7 +83,7 @@ pathToExps  = os.path.join(pathToRoot, 'experiments')
 pathToLogs  = os.path.join(pathToExps, 'logs')
 run_id  = 1
 logs    = [f for f in glob.glob(os.path.join(pathToLogs, '*.csv'))]
-run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
+run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.budget)+'-'+args.adj+'-'+args.tag+'-'
 while os.path.join(pathToLogs, run_stamp + str(run_id)+'.csv') in logs:
     run_id  += 1
 run_stamp   = run_stamp + str(run_id)
@@ -99,7 +99,7 @@ pathToWDS   = os.path.join('water_networks', wds_name+'.inp')
 hyperparams = {
         'db': args.db,
         'deploy': args.deploy,
-        'obsrat': args.obsrat,
+        'budget': args.budget,
         'adj': args.adj,
         'epoch': args.epoch,
         'batch': args.batch,
@@ -168,7 +168,7 @@ if args.deterministic:
 else:
     seed    = None
 
-sensor_budget   = int(len(wds.junctions) * args.obsrat)
+sensor_budget   = args.budget
 print('Deploying {} sensors...\n'.format(sensor_budget))
 
 sensor_shop = SensorInstaller(wds, include_pumps_as_master=True)
@@ -218,7 +218,7 @@ elif args.deploy == 'hdvar':
     del reader, heads
 elif args.deploy == 'random':
     sensor_shop.deploy_by_random(
-            sensor_budget   = sensor_budget,
+            sensor_budget   = len(sensor_shop.master_nodes)+sensor_budget,
             seed            = seed
             )
 else:
