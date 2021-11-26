@@ -173,16 +173,15 @@ class SensorInstaller():
         self.sensor_nodes   = sensor_nodes
 
     def deploy_by_shortest_path_with_sensitivity(
-            self, sensor_budget, sensitivity_matrix, weight_by=None, aversion=0, sensor_nodes=None):
+            self, sensor_budget, node_weights_arr, weight_by=None, aversion=0, sensor_nodes=None):
         assert aversion >= 0
         if not sensor_nodes:
             sensor_nodes    = set()
-        sensor_nodes        = set()
-        forbidden_nodes     = self.master_nodes
-        nodal_sensitivity   = dict()
-        nodal_sensitivities = np.sum(np.abs(sensitivity_matrix), axis=0)
+        sensor_nodes    = set()
+        forbidden_nodes = self.master_nodes
+        node_weights    = dict()
         for i, junc in enumerate(self.wds.junctions):
-            nodal_sensitivity[junc.index]   = nodal_sensitivities[i]
+            node_weights[junc.index]   = node_weights_arr[i]
 
         for _ in range(sensor_budget):
             path_lengths    = dict()
@@ -198,8 +197,8 @@ class SensorInstaller():
                     weight  = weight_by
                     )
                 for key, value in tempo.items():
-                    if (key not in forbidden_nodes) and (path_lengths[key] > nodal_sensitivity[key]*value):
-                        path_lengths[key]   = nodal_sensitivity[key]*value
+                    if (key not in forbidden_nodes) and (path_lengths[key] > node_weights[key]*value):
+                        path_lengths[key]   = node_weights[key]*value
             sensor_node = [candidate for candidate, path_length in path_lengths.items() 
                     if path_length == np.max(list(path_lengths.values()))][0]
             sensor_nodes.add(sensor_node)
@@ -217,10 +216,10 @@ class SensorInstaller():
             print('Aversion is not implemented in this module.')
         sensor_nodes        = set()
         forbidden_nodes     = self.master_nodes
-        nodal_sensitivity   = dict()
+        node_weights   = dict()
         nodal_sensitivities = np.sum(np.abs(sensitivity_matrix), axis=0)
         for i, junc in enumerate(self.wds.junctions):
-            nodal_sensitivity[junc.index]   = nodal_sensitivities[i]
+            node_weights[junc.index]   = nodal_sensitivities[i]
 
         for _ in range(sensor_budget):
             path_lengths    = dict()
@@ -236,8 +235,8 @@ class SensorInstaller():
                     weight  = weight_by
                     )
                 for key, value in tempo.items():
-                    if (key not in forbidden_nodes) and (path_lengths[key] > nodal_sensitivity[key]*value):
-                        path_lengths[key]   = nodal_sensitivity[key]*value
+                    if (key not in forbidden_nodes) and (path_lengths[key] > node_weights[key]*value):
+                        path_lengths[key]   = node_weights[key]*value
             sensor_node = [candidate for candidate, path_length in path_lengths.items() 
                     if path_length == np.max(list(path_lengths.values()))][0]
             branch  = self.get_shortest_path_to_node_collection(
