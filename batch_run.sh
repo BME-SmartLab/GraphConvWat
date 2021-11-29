@@ -11,6 +11,12 @@
 for idx in {1..15}
 do
 	python train.py --epoch 1000 --adj binary --tag ms --deploy xrandom --deterministic --wds anytown --budget 1 --batch 200
+done
+for idx in {1..15}
+do
 	python train.py --epoch 1000 --adj binary --tag ms --deploy xrandom --deterministic --wds ctown --budget 5 --batch 120
-#	python train.py --epoch 1000 --adj binary --tag ms --deploy xrandom --deterministic --wds richmond --budget 10 --batch 50
+done
+for idx in {1..15}
+do
+	python train.py --epoch 1000 --adj binary --tag ms --deploy xrandom --deterministic --wds richmond --budget 10 --batch 50
 done

@@ -41,7 +41,7 @@ parser.add_argument('--adj',
                     help    = "Type of adjacency matrix.")
 parser.add_argument('--deploy',
                     default = 'random',
-                    choices = ['master', 'dist', 'hydrodist', 'hds', 'hdvar', 'random'],
+                    choices = ['master', 'dist', 'hydrodist', 'hds', 'hdvar', 'random', 'xrandom'],
                     type    = str,
                     help    = "Method of sensor deployment.")
 parser.add_argument('--epoch',
