@@ -221,6 +221,12 @@ elif args.deploy == 'random':
             sensor_budget   = len(sensor_shop.master_nodes)+sensor_budget,
             seed            = seed
             )
+elif args.deploy == 'xrandom':
+    sensor_shop.deploy_by_xrandom(
+            sensor_budget   = sensor_budget,
+            seed            = seed,
+            sensor_nodes    = sensor_shop.master_nodes
+            )
 else:
     print('Sensor deployment technique is unknown.\n')
     raise

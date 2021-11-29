@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import networkx as nx
 import numpy as np
+import random
 
 from utils.graph_utils import get_nx_graph
 
@@ -99,6 +100,14 @@ class SensorInstaller():
             )
         signal_mask[observed_nodes] = 1
         self.sensor_nodes   = set(self.wds.junctions.index[np.where(signal_mask)[0]])
+
+    def deploy_by_xrandom(self, sensor_budget, seed=None, sensor_nodes=None):
+        random.seed(seed)
+        if not sensor_nodes:
+            sensor_nodes    = set()
+        free_nodes  = set(self.G.nodes).difference(sensor_nodes)
+        rnd_nodes   = random.sample(free_nodes, sensor_budget)
+        self.sensor_nodes   = sensor_nodes.union(rnd_nodes)
 
     def deploy_by_random_deprecated(self, sensor_budget, seed=None):
         num_nodes   = len(self.G.nodes)
