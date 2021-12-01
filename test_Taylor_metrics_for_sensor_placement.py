@@ -34,14 +34,13 @@ parser.add_argument('--wds',
                     )
 parser.add_argument('--deploy',
                     default = 'random',
-                    choices = ['random', 'dist', 'hydrodist', 'hds', 'hdsa'],
+                    choices = ['master', 'dist', 'hydrodist', 'hds', 'hdvar', 'random', 'xrandom'],
                     type    = str,
                     help    = "Method of sensor deployment.")
-parser.add_argument('--obsrat',
-                    default = .1,
-                    type    = float,
-                    help    = "Observation ratio."
-                    )
+parser.add_argument('--budget',
+                    default = 1,
+                    type    = int,
+                    help    = "Sensor budget.")
 parser.add_argument('--batch',
                     default = 80,
                     type    = int,
@@ -82,7 +81,7 @@ pathToRoot  = os.path.dirname(os.path.realpath(__file__))
 pathToExps  = os.path.join(pathToRoot, 'experiments')
 pathToLogs  = os.path.join(pathToExps, 'logs')
 run_id      = args.runid
-run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.obsrat)+'-'+args.adj+'-'+args.tag+'-'
+run_stamp   = wds_name+'-'+args.deploy+'-'+str(args.budget)+'-'+args.adj+'-'+args.tag+'-'
 run_stamp   = run_stamp + str(run_id)
 pathToDB    = os.path.join(pathToRoot, 'data', 'db_' + wds_name +'_'+ args.db)
 pathToModel = os.path.join(pathToExps, 'models', run_stamp+'.pt')
