@@ -42,7 +42,7 @@ args    = parser.parse_args()
 # DB loading
 # ----- ----- ----- ----- ----- -----
 df  = pd.read_csv(os.path.join('..', 'experiments', 'Taylor_metrics_processed.csv'), index_col=0)
-df  = df.loc[(df['tag'] == 'placement') & (df['wds'] == args.wds) & (df['obs_rat'] == args.obsrat)]
+df  = df.loc[(df['tag'] == args.tag) & (df['wds'] == args.wds) & (df['obs_rat'] == args.obsrat)]
 
 # ----- ----- ----- ----- ----- -----
 # Plot assembly
@@ -57,7 +57,7 @@ dia = TaylorDiagram(
 dia.samplePoints[0].set_color('r')
 dia.samplePoints[0].set_marker('P')
 cmap    = plt.get_cmap('Paired')
-markers = ['s', 'x', '*', '.', '+']
+markers = ['s', 'x', '*', '.', '+', 'o']
 
 def add_samples(dia, df, color, marker):
     for idx_dst, row in df.iterrows():
@@ -75,12 +75,13 @@ def add_samples(dia, df, color, marker):
 seeds   = [1, 8, 5266, 739, 88867]
 #seeds   = [88867]
 for i, seed in enumerate(seeds):
-    mask    = (df['placement'] == 'random') & (df['seed'] == seed)
-    add_samples(dia, df.loc[mask], cmap(i+5), markers[3])
-add_samples(dia, df.loc[df['placement'] == 'dist'], cmap(1), markers[0])
-add_samples(dia, df.loc[df['placement'] == 'hydrodist'], cmap(2), markers[1])
-add_samples(dia, df.loc[df['placement'] == 'hds'], cmap(3), markers[2])
-add_samples(dia, df.loc[df['placement'] == 'hdsa'], cmap(4), markers[4])
+    mask    = (df['placement'] == 'xrandom') & (df['seed'] == seed)
+    add_samples(dia, df.loc[mask], cmap(i+5), markers[0])
+add_samples(dia, df.loc[df['placement'] == 'master'], cmap(3), markers[-1])
+add_samples(dia, df.loc[df['placement'] == 'dist'], cmap(3), markers[1])
+add_samples(dia, df.loc[df['placement'] == 'hydrodist'], cmap(3), markers[2])
+add_samples(dia, df.loc[df['placement'] == 'hds'], cmap(3), markers[3])
+add_samples(dia, df.loc[df['placement'] == 'hdvar'], cmap(3), markers[4])
 
 contours    = dia.add_contours(
                 levels      = 6,
