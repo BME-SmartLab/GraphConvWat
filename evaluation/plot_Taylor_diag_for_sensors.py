@@ -90,7 +90,7 @@ add_samples(dia, df.loc[df['placement'] == 'dist'], 'k', '+', mean=args.mean)
 add_samples(dia, df.loc[df['placement'] == 'hydrodist'], 'k', '*', mean=args.mean)
 add_samples(dia, df.loc[df['placement'] == 'hds'], 'k', 'x', mean=args.mean)
 for i, seed in enumerate(seeds):
-    mask    = (df['placement'] == 'xrandom') & (df['seed'] == seed)
+    mask    = (df['placement'] == 'random') & (df['seed'] == seed)
     add_samples(dia, df.loc[mask], cmap(i+5), 's', mean=args.mean)
 
 contours    = dia.add_contours(
