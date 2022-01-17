@@ -13,6 +13,7 @@ from epynet import Network
 sys.path.insert(0, os.path.join('..'))
 from utils.graph_utils import get_nx_graph, get_sensitivity_matrix
 from utils.SensorInstaller import SensorInstaller
+from utils.DataReader import DataReader
 
 # ----- ----- ----- ----- ----- -----
 # Command line arguments
@@ -31,12 +32,14 @@ parser.add_argument(
     )
 parser.add_argument(
     '--perturb',
-    action  = "store_true",
+    default = None,
+    type    = int
     )
 args    = parser.parse_args()
 
 pathToRoot      = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 pathToModels    = os.path.join(pathToRoot, 'experiments', 'models')
+pathToDB        = os.path.join(pathToRoot, 'data', 'db_' + args.wds +'_doe_pumpfed_1')
 
 wds = Network(os.path.join('..', 'water_networks', args.wds+'.inp'))
 wds.solve()
@@ -44,15 +47,21 @@ wds.solve()
 print('Calculating nodal sensitivity to demand change...\n')
 ptb = np.max(wds.junctions.basedemand) / 100
 if args.perturb:
-    for pump in wds.pumps:
-        pump.speed *= 1.1
+    G       = get_nx_graph(wds)
+    reader  = DataReader(
+                pathToDB,
+                n_junc  = len(wds.junctions),
+                node_order  = np.array(list(G.nodes))-1
+                )
+    demands, _, _   = reader.read_data(
+        dataset = 'trn',
+        varname = 'junc_demands',
+        rescale = None,
+        cover   = False
+        )
+    demands = pd.Series(demands[args.perturb,:,0], index=wds.junctions.uid)
+    wds.junctions.basedemand    = demands
 
-    for junc in wds.junctions:
-        tempo = np.random.rand()
-        if tempo < .3:
-            junc.basedemand *= 1.1
-        elif tempo > .6:
-            junc.basedemand *= .9
 S   = get_sensitivity_matrix(wds, ptb)
 
 def get_node_df(elements, get_head=False):
